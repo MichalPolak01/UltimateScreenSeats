@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,9 +38,19 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
+    # Libs
+    "corsheaders",
+    "ninja_extra",
+    "ninja_jwt",
+    
+    # App
+    "core",
+    "authentication",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -48,6 +59,18 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+CORS_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+AUTH_USER_MODEL = 'authentication.User'
 
 ROOT_URLCONF = "core.urls"
 
@@ -81,24 +104,19 @@ WSGI_APPLICATION = "core.wsgi.application"
 # }
 
 DATABASES = {
-
     'default': {
-
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-
-        'NAME': '2023_polak_michal?currentSchema=cinema_ticket_booking',
-
+        'NAME': '2023_polak_michal',
         'USER': '2023_polak_michal',
-
         'PASSWORD': '35229',
-
         'HOST': '195.150.230.208',
-
         'PORT': '5432',
-
+        'OPTIONS': {
+            'options': '-c search_path=cinema_ticket_booking',
+        },
     }
-
 }
+
 
 
 # Password validation
@@ -141,3 +159,14 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+NINJA_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=14),
+}
+
+NINJA_SETTINGS = {
+    "EXCEPTION_HANDLERS": {
+        "ValidationError": "learn_how_to_code.exception_handlers.validation_error_handler",
+    }
+}
