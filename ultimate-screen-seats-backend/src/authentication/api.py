@@ -4,6 +4,8 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import authenticate
 from ninja_jwt.tokens import RefreshToken
 
+import helpers
+
 from .models import User
 from .schemas import LoginSchema, RegisterSchema, UserDetailSchema
 from core.schemas import MessageSchema
@@ -47,3 +49,13 @@ def login(request, payload: LoginSchema):
         "username": user.username,
         "role": user.role
     }
+
+
+@router.get("/user", response={200: UserDetailSchema, 400: MessageSchema}, auth=helpers.auth_required)
+def get_user(request):
+    try:
+        user = request.user
+
+        return 200, user
+    except Exception as e:
+        return 400, {"message": "An unexpected error occurred."}
