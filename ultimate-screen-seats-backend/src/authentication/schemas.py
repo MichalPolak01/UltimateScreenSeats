@@ -28,6 +28,15 @@ class UserDetailSchema(Schema):
     email: EmailStr
     role: str
 
+class UserUpdateSchema(Schema):
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
+    role: Optional[str] = None
+
+    @field_validator("role")
+    def validate_role(cls, value):
+        return validate_role(value)
+
 
 
 # Validators

@@ -7,7 +7,7 @@ from ninja_jwt.tokens import RefreshToken
 import helpers
 
 from .models import User
-from .schemas import LoginSchema, RegisterSchema, UserDetailSchema
+from .schemas import LoginSchema, RegisterSchema, UserDetailSchema, UserUpdateSchema
 from core.schemas import MessageSchema
 
 router = Router()
@@ -57,5 +57,28 @@ def get_user(request):
         user = request.user
 
         return 200, user
+    except Exception as e:
+        return 400, {"message": "An unexpected error occurred."}
+    
+
+@router.patch("/user", response={200: UserDetailSchema, 400: MessageSchema}, auth=helpers.auth_required)
+def update_user(request, payload: UserUpdateSchema):
+    try:
+        user = request.user
+
+        if payload.email and User.objects.filter(email=payload.email).exclude(id=user.id).exists():
+            return 400, {"message": "Email is already taken."}
+        
+        if payload.username and User.objects.filter(username=payload.username).exclude(id=user.id).exists():
+            return 400, {"message": "Username is already taken."}
+
+        for attr, value in payload.dict(exclude_unset=True).items():
+            setattr(user, attr, value)
+
+        user.save()
+
+        return 200, user
+    except ValidationError as e:
+        return 400, {"message": str(e)}
     except Exception as e:
         return 400, {"message": "An unexpected error occurred."}
