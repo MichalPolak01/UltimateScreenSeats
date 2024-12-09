@@ -18,6 +18,10 @@ class RegisterSchema(Schema):
     def validate_role(cls, value):
         return validate_role(value)
     
+class LoginSchema(Schema):
+    email: EmailStr
+    password: str
+
 class UserDetailSchema(Schema):
     id: int
     username: str
@@ -28,7 +32,7 @@ class UserDetailSchema(Schema):
 
 # Validators
 def validate_role(value):
-    allowed_roles = ["USER", "TEACHER", "ADMIN"]
+    allowed_roles = ["USER", "ADMIN"]
 
     if value not in allowed_roles:
         raise ValueError(f"Invalid role: {value}")

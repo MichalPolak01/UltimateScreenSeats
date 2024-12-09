@@ -1,9 +1,11 @@
 from ninja import Router
 from pydantic import ValidationError
 from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth import authenticate
+from ninja_jwt.tokens import RefreshToken
 
 from .models import User
-from .schemas import RegisterSchema, UserDetailSchema
+from .schemas import LoginSchema, RegisterSchema, UserDetailSchema
 from core.schemas import MessageSchema
 
 router = Router()
@@ -28,3 +30,20 @@ def register(request, payload: RegisterSchema):
         return 400, {"message": str(e)}
     except Exception as e:
         return 400, {"message": "An unexpected error occurred."}
+    
+
+@router.post("/login", response={200: dict, 401: MessageSchema})
+def login(request, payload: LoginSchema):
+    user = authenticate(request, email=payload.email, password=payload.password)
+
+    if user is None:
+        return 401, {"message": "Invalid email or password"}
+    
+    refresh = RefreshToken.for_user(user)
+
+    return {
+        "refresh": str(refresh),
+        "access": str(refresh.access_token),
+        "username": user.username,
+        "role": user.role
+    }
