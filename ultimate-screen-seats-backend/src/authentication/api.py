@@ -7,7 +7,7 @@ from ninja_jwt.tokens import RefreshToken
 import helpers
 
 from .models import User
-from .schemas import LoginSchema, RegisterSchema, UserDetailSchema, UserUpdateSchema
+from .schemas import ChangePasswordSchema, LoginSchema, RegisterSchema, UserDetailSchema, UserUpdateSchema
 from core.schemas import MessageSchema
 
 router = Router()
@@ -78,6 +78,26 @@ def update_user(request, payload: UserUpdateSchema):
         user.save()
 
         return 200, user
+    except ValidationError as e:
+        return 400, {"message": str(e)}
+    except Exception as e:
+        return 400, {"message": "An unexpected error occurred."}
+    
+
+@router.post("/change-password", response={200: MessageSchema, 400: MessageSchema}, auth=helpers.auth_required)
+def change_password(request, payload: ChangePasswordSchema):
+    try:
+        user = request.user
+        if not check_password(payload.old_password, user.password):
+            return 400, {"message": "Old password incorrect."}
+        
+        if payload.new_password != payload.confirm_password:
+            return 400, {"message": "New passwords do not match."}
+        
+        user.password = make_password(payload.new_password)
+        user.save()
+
+        return 200, {"message": "Password changed successfully."}
     except ValidationError as e:
         return 400, {"message": str(e)}
     except Exception as e:

@@ -37,7 +37,15 @@ class UserUpdateSchema(Schema):
     def validate_role(cls, value):
         return validate_role(value)
 
+class ChangePasswordSchema(Schema):
+    old_password: str
+    new_password: str
+    confirm_password: str
 
+    @field_validator("new_password")
+    def validate_new_password(cls, value):
+        return validate_password(value)
+    
 
 # Validators
 def validate_role(value):
