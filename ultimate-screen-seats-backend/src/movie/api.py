@@ -16,3 +16,15 @@ def create_movie(request, payload: MovieCreateSchema):
         return 201, movie
     except Exception as e:
         return 500, {"message": "An unexpected error ocurred during create movie."}
+    
+
+@router.get('', response={200: list[MovieSchema], 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
+def get_movies(request):
+    try:
+        movies = Movie.objects.all().order_by('-release_date')
+
+        return 200, movies
+    except Movie.DoesNotExist:
+        return 404, {"message", {"Movies not found."}}
+    except Exception as e:
+        return 500, {"message": "An unexpected error ocurred during fetching movies."}

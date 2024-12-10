@@ -8,6 +8,7 @@ class Movie(models.Model):
     movie_length = models.IntegerField(default=0.0)
     age_classification = models.IntegerField(default=0)
     image = models.CharField(max_length=255)
+    release_date = models.DateField(blank=True, null=True)
 
     def __str__(self):
         return {
@@ -16,5 +17,6 @@ class Movie(models.Model):
             'genere': self.genre,
             'movie_length': self.movie_length,
             'age_classification': self.age_classification,
-            'image': self.image
+            'image': self.image,
+            'release_date': self.release_date
         }

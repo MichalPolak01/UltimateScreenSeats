@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Optional
 from ninja import Schema
 from pydantic import fields
@@ -11,6 +12,7 @@ class MovieSchema(Schema):
     movie_length: int
     age_classification: int
     image: str
+    release_date: Optional[date]
 
     class Config:
         form_atributes = True
@@ -22,3 +24,4 @@ class MovieCreateSchema(Schema):
     movie_length: int
     age_classification: int
     image: str
+    release_date: Optional[date]
