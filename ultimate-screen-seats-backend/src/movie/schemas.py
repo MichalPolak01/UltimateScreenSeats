@@ -12,16 +12,26 @@ class MovieSchema(Schema):
     movie_length: int
     age_classification: int
     image: str
-    release_date: Optional[date]
+    release_date: date
 
     class Config:
         form_atributes = True
 
 class MovieCreateSchema(Schema):
     title: str
-    description: Optional[str]
+    description: Optional[str] = None
     genre: str
     movie_length: int
     age_classification: int
     image: str
-    release_date: Optional[date]
+    release_date: date
+
+
+class MovieUpdateSchema(Schema):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    genre: Optional[str] = None
+    movie_length: Optional[int] = None
+    age_classification: Optional[int] = None
+    image: Optional[str] = None
+    release_date: Optional[date] = None
