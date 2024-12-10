@@ -9,14 +9,3 @@ class Movie(models.Model):
     age_classification = models.IntegerField(default=0)
     image = models.CharField(max_length=255)
     release_date = models.DateField(blank=True, null=True)
-
-    def __str__(self):
-        return {
-            'title': self.title,
-            'description': self.description,
-            'genere': self.genre,
-            'movie_length': self.movie_length,
-            'age_classification': self.age_classification,
-            'image': self.image,
-            'release_date': self.release_date
-        }
