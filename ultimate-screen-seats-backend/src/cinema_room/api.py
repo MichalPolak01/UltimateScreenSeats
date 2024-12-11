@@ -69,3 +69,19 @@ def update_cienema_rooms(request, payload: CinemaRoomUpdateSchema, cinema_room_i
         return 404, {"message": "Cinema room not found."}
     except Exception as e:
         return 500, {"message": "An unexpected error ocurred during updating cinema room."}
+    
+
+@router.delete('{cinema_room_id}', response={200: MessageSchema, 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
+def delete_cienema_room(request, cinema_room_id):
+    """Remove cinema room by `cinema_room_id`"""
+
+    try:
+        cienema_room = CinemaRoom.objects.get(id=cinema_room_id)
+
+        cienema_room.delete()
+
+        return 200, {"message": "Cinema room removed successfully."}
+    except CinemaRoom.DoesNotExist:
+        return 404, {"message": "Cinema room not found."}
+    except Exception as e:
+        return 500, {"message": "An unexpected error ocurred during removeing cinema room."}
