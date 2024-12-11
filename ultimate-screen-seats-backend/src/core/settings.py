@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     "authentication",
     "movie",
     "cinema_room",
-    "showing"
+    "showing",
+    "reservation"
 ]
 
 MIDDLEWARE = [
