@@ -1,6 +1,5 @@
 from django.db import models
 
-# Create your models here.
 
 class Reservation(models.Model):
     showing = models.ForeignKey('showing.Showing', on_delete=models.CASCADE)

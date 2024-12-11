@@ -127,3 +127,19 @@ def update_reservation(request, reservation_id: int, payload: ReservationUpdateS
         return 404, {"message": f"Reservation with id {reservation_id} doesn't exist."}
     except Exception as e:
         return 400, {"message": f"An unexpected error occurred: {e}"}
+
+
+@router.delete('{reservation_id}', response={200: MessageSchema, 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
+def delete_reservation(request, reservation_id: int):
+    """Delete single reservation by `reservation_id`"""
+
+    try:
+        reservation = Reservation.objects.get(id=reservation_id)
+
+        reservation.delete()
+
+        return 200, {"message": f"Reservation {reservation_id} removed successfully."}
+    except Reservation.DoesNotExist:
+        return 404, {"message": "Reservations doen't exist."}
+    except Exception as e:
+        return 400, {"message": f"An unexpected error occurred: {e}"}

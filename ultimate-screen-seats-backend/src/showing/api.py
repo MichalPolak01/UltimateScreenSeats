@@ -72,24 +72,20 @@ def get_available_seats(request, showing_id: int):
     Get available seats for a specific showing
     """
     try:
-        # Pobierz Showing
         showing = Showing.objects.select_related('cinema_room').get(id=showing_id)
         cinema_room = showing.cinema_room
 
-        # Pobierz wszystkie rezerwacje dla tego seansu
         reserved_seats = Reservation.objects.filter(showing=showing).values_list('seat_row', 'seat_column')
 
-        # Zablokuj zajęte miejsca
-        seat_layout = [row[:] for row in cinema_room.seat_layout]  # Kopia układu
+        seat_layout = [row[:] for row in cinema_room.seat_layout]
         for seat_row, seat_column in reserved_seats:
-            seat_layout[seat_row][seat_column] = 0  # Oznacz jako zajęte (0)
+            seat_layout[seat_row][seat_column] = 0
 
-        # Zwróć tylko miejsca dostępne
         available_seats = [
             {"row": row_index, "column": col_index}
             for row_index, row in enumerate(seat_layout)
             for col_index, seat in enumerate(row)
-            if seat == 1  # Wolne miejsca
+            if seat == 1
         ]
 
         return 200, available_seats

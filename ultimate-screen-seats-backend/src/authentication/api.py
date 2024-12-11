@@ -14,6 +14,8 @@ router = Router()
 
 @router.post("/register", response= {201: UserDetailSchema, 400: MessageSchema})
 def register(request, payload: RegisterSchema):
+    """Create new account"""
+
     try:
         if User.objects.filter(email=payload.email).exists():
             return 400, {"message": "Email is already registered."}
@@ -36,6 +38,8 @@ def register(request, payload: RegisterSchema):
 
 @router.post("/login", response={200: dict, 401: MessageSchema})
 def login(request, payload: LoginSchema):
+    """Log in on existing account"""
+
     user = authenticate(request, email=payload.email, password=payload.password)
 
     if user is None:
@@ -53,6 +57,8 @@ def login(request, payload: LoginSchema):
 
 @router.get("/user", response={200: UserDetailSchema, 400: MessageSchema}, auth=helpers.auth_required)
 def get_user(request):
+    """Get list of users"""
+
     try:
         user = request.user
 
@@ -63,6 +69,8 @@ def get_user(request):
 
 @router.patch("/user", response={200: UserDetailSchema, 400: MessageSchema}, auth=helpers.auth_required)
 def update_user(request, payload: UserUpdateSchema):
+    """Update user credentials"""
+
     try:
         user = request.user
 
@@ -86,6 +94,8 @@ def update_user(request, payload: UserUpdateSchema):
 
 @router.post("/change-password", response={200: MessageSchema, 400: MessageSchema}, auth=helpers.auth_required)
 def change_password(request, payload: ChangePasswordSchema):
+    """Change password to account"""
+
     try:
         user = request.user
         if not check_password(payload.old_password, user.password):
