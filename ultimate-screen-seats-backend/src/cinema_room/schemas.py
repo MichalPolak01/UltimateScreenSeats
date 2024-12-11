@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from ninja import Schema
 
 
@@ -14,3 +14,8 @@ class CinemaRoomSchema(Schema):
 class CinemaRoomCreateSchema(Schema):
     name: str
     seat_layout: List[List[int]]
+
+
+class CinemaRoomUpdateSchema(Schema):
+    name: Optional[str] = None
+    seat_layout: Optional[List[List[int]]] = None

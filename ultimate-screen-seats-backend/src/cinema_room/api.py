@@ -1,6 +1,6 @@
 from ninja_extra import Router
 
-from .schemas import CinemaRoomSchema, CinemaRoomCreateSchema
+from .schemas import CinemaRoomSchema, CinemaRoomCreateSchema, CinemaRoomUpdateSchema
 from core.schemas import MessageSchema
 from .models import CinemaRoom
 
@@ -11,6 +11,8 @@ router = Router()
 
 @router.post('', response={201: CinemaRoomSchema, 400: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
 def create_cinema_room(request, payload: CinemaRoomCreateSchema):
+    """Create new cinema room"""
+
     try:
         if CinemaRoom.objects.filter(name=payload.name).exists():
             return 400, {"message": "Cinema rooms with this name already exists."}
@@ -24,6 +26,8 @@ def create_cinema_room(request, payload: CinemaRoomCreateSchema):
 
 @router.get('', response={200: list[CinemaRoomSchema], 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
 def get_cienema_rooms(request):
+    """Fetch list of cienema rooms"""
+
     try:
         cienema_rooms = CinemaRoom.objects.all()
 
@@ -35,7 +39,9 @@ def get_cienema_rooms(request):
     
 
 @router.get('{cinema_room_id}', response={200: CinemaRoomSchema, 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
-def get_cienema_rooms(request, cinema_room_id):
+def get_cienema_room(request, cinema_room_id):
+    """Fetch cinema room by `cinema_room_id`"""
+
     try:
         cienema_room = CinemaRoom.objects.get(id=cinema_room_id)
 
@@ -44,3 +50,22 @@ def get_cienema_rooms(request, cinema_room_id):
         return 404, {"message": "Cinema room not found."}
     except Exception as e:
         return 500, {"message": "An unexpected error ocurred during fetching cinema room."}
+    
+
+@router.patch('{cinema_room_id}', response={200: CinemaRoomSchema, 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
+def update_cienema_rooms(request, payload: CinemaRoomUpdateSchema, cinema_room_id):
+    """Update cinema room by `cinema_room_id`"""
+
+    try:
+        cienema_room = CinemaRoom.objects.get(id=cinema_room_id)
+
+        for attr, value in payload.dict(exclude_unset=True).items():
+            setattr(cienema_room, attr, value)
+
+        cienema_room.save()
+
+        return 200, cienema_room
+    except CinemaRoom.DoesNotExist:
+        return 404, {"message": "Cinema room not found."}
+    except Exception as e:
+        return 500, {"message": "An unexpected error ocurred during updating cinema room."}
