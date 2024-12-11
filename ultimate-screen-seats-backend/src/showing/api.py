@@ -35,3 +35,15 @@ def create_showing(request, payload: ShowingCreateSchema):
     except Exception as e:
         traceback.print_exc()
         return 500, {"message": "An unexpected error ocurred during creating showing."}
+    
+
+@router.get('', response={200: list[ShowingSchema], 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
+def get_showings(request):
+    try:
+        showings = Showing.objects.all()
+
+        return 200, showings
+    except Showing.DoesNotExist:
+        return 404, {"message": {f"Showings doesn't exist."}}
+    except Exception as e:
+        return 500, {"message": "An unexpected error ocurred during fetching showings."}
