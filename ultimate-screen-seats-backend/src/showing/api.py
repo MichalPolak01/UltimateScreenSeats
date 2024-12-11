@@ -15,6 +15,7 @@ router = Router()
 
 @router.post('', response={201: ShowingSchema, 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
 def create_showing(request, payload: ShowingCreateSchema):
+    """Create a new showing"""
 
     try:
         movie = Movie.objects.get(id=payload.movie_id)
@@ -39,11 +40,26 @@ def create_showing(request, payload: ShowingCreateSchema):
 
 @router.get('', response={200: list[ShowingSchema], 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
 def get_showings(request):
+    """Fetch list of schowings"""
+
     try:
         showings = Showing.objects.all()
 
         return 200, showings
     except Showing.DoesNotExist:
         return 404, {"message": {f"Showings doesn't exist."}}
+    except Exception as e:
+        return 500, {"message": "An unexpected error ocurred during fetching showings."}
+    
+
+@router.get('/{showing_id}', response={200: ShowingSchema, 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
+def get_showing(request, showing_id: int):
+    """Fetch a single showing by `showing_id`"""
+    try:
+        showing = Showing.objects.get(id=showing_id)
+
+        return 200, showing
+    except Showing.DoesNotExist:
+        return 404, {"message": {f"Showing with id {showing_id} doesn't exist."}}
     except Exception as e:
         return 500, {"message": "An unexpected error ocurred during fetching showings."}
