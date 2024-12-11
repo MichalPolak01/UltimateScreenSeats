@@ -43,6 +43,7 @@ def create_reservation(request, payload: ReservationCreateSchema):
 
 @router.get('', response={200: list[ReservationSchema], 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
 def get_reservations(request):
+    """Fetch list of reservations"""
     try:
         reservations = Reservation.objects.all()
 
@@ -56,7 +57,7 @@ def get_reservations(request):
 @router.get('/{option}/{id}', response={200: list[ReservationSchema], 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
 def get_reservations_with_option(request, option: str, id: int):
     """Fetch reservations by single `user` or `movie`"""
-    
+
     try:
         if option == "user":
             reservations = Reservation.objects.filter(user_id=id)
@@ -72,3 +73,17 @@ def get_reservations_with_option(request, option: str, id: int):
 
     except Exception as e:
         return 500, {"message": f"An unexpected error occurred: {e}"}
+    
+
+@router.get('{reservation_id}', response={200: ReservationSchema, 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
+def get_reservation(request, reservation_id: int):
+    """Fetch single reservation by `reservation_id`"""
+
+    try:
+        reservation = Reservation.objects.get(id=reservation_id)
+
+        return 200, reservation
+    except Reservation.DoesNotExist:
+        return 404, {"message": "Reservations doen't exist."}
+    except Exception as e:
+        return 400, {"message": f"An unexpected error occurred: {e}"}
