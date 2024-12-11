@@ -2,7 +2,7 @@ from ninja_extra import Router
 
 from core.schemas import MessageSchema
 
-from .schemas import ReservationCreateSchema, ReservationSchema
+from .schemas import ReservationCreateSchema, ReservationSchema, ReservationUpdateSchema
 from showing.models import Showing
 from .models import Reservation
 
@@ -85,5 +85,45 @@ def get_reservation(request, reservation_id: int):
         return 200, reservation
     except Reservation.DoesNotExist:
         return 404, {"message": "Reservations doen't exist."}
+    except Exception as e:
+        return 400, {"message": f"An unexpected error occurred: {e}"}
+    
+
+@router.patch('{reservation_id}', response={200: ReservationSchema, 400: MessageSchema, 404: MessageSchema}, auth=helpers.auth_required)
+def update_reservation(request, reservation_id: int, payload: ReservationUpdateSchema):
+    """Update an existing reservation by `reservation_id`"""
+
+    try:
+        reservation = Reservation.objects.get(id=reservation_id)
+
+        if payload.showing_id is not None:
+            try:
+                showing = Showing.objects.get(id=payload.showing_id)
+                reservation.showing = showing
+            except Showing.DoesNotExist:
+                return 404, {"message": f"Showing with id {payload.showing_id} doesn't exist."}
+
+        if payload.seat_row is not None and payload.seat_column is not None:
+            cinema_room = reservation.showing.cinema_room
+
+            if payload.seat_row >= len(cinema_room.seat_layout) or payload.seat_column >= len(cinema_room.seat_layout[0]):
+                return 400, {"message": "Invalid seat coordinates."}
+
+            if Reservation.objects.filter(
+                showing=reservation.showing,
+                seat_row=payload.seat_row,
+                seat_column=payload.seat_column
+            ).exclude(id=reservation_id).exists():
+                return 400, {"message": "Seat is already reserved."}
+
+            reservation.seat_row = payload.seat_row
+            reservation.seat_column = payload.seat_column
+
+        reservation.save()
+
+        return 200, reservation
+
+    except Reservation.DoesNotExist:
+        return 404, {"message": f"Reservation with id {reservation_id} doesn't exist."}
     except Exception as e:
         return 400, {"message": f"An unexpected error occurred: {e}"}
