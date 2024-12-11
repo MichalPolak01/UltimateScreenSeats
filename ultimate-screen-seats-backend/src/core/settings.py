@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     "core",
     "authentication",
     "movie",
-    "cinema_room"
+    "cinema_room",
+    "showing"
 ]
 
 MIDDLEWARE = [
