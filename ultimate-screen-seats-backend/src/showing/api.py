@@ -4,6 +4,7 @@ from ninja_extra import Router
 from cinema_room.models import CinemaRoom
 from core.schemas import MessageSchema
 from movie.models import Movie
+from reservation.models import Reservation
 
 from .schemas import ShowingSchema, ShowingCreateSchema, ShowingUpdateSchema
 from .models import Showing
@@ -64,6 +65,33 @@ def get_showing(request, showing_id: int):
     except Exception as e:
         return 500, {"message": "An unexpected error ocurred during fetching showings."}
     
+
+@router.get('/{showing_id}/available-seats', response={200: list, 404: MessageSchema}, auth=helpers.auth_required)
+def get_available_seats(request, showing_id: int):
+    """
+    Get available seats for a specific showing
+    """
+    try:
+        showing = Showing.objects.select_related('cinema_room').get(id=showing_id)
+        cinema_room = showing.cinema_room
+
+        reserved_seats = Reservation.objects.filter(showing=showing).values_list('seat_row', 'seat_column')
+
+        seat_layout = [row[:] for row in cinema_room.seat_layout]
+        for seat_row, seat_column in reserved_seats:
+            seat_layout[seat_row][seat_column] = 0
+
+        available_seats = [
+            {"row": row_index, "column": col_index}
+            for row_index, row in enumerate(seat_layout)
+            for col_index, seat in enumerate(row)
+            if seat == 1
+        ]
+
+        return 200, available_seats
+    except Showing.DoesNotExist:
+        return 404, {"message": f"Showing with id {showing_id} doesn't exist."}
+
 
 @router.patch('/{showing_id}', response={200: ShowingSchema, 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
 def update_showing(request, showing_id: int, payload: ShowingUpdateSchema):
