@@ -51,3 +51,24 @@ def get_reservations(request):
         return 404, {"message": "Reservations doen't exist."}
     except Exception as e:
         return 400, {"message": f"An unexpected error occurred: {e}"}
+    
+
+@router.get('/{option}/{id}', response={200: list[ReservationSchema], 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
+def get_reservations_with_option(request, option: str, id: int):
+    """Fetch reservations by single `user` or `movie`"""
+    
+    try:
+        if option == "user":
+            reservations = Reservation.objects.filter(user_id=id)
+        elif option == "movie":
+            reservations = Reservation.objects.filter(showing__movie_id=id)
+        else:
+            return 404, {"message": f"Invalid option '{option}'. Use 'user' or 'movie'."}
+
+        if not reservations.exists():
+            return 404, {"message": f"No reservations found for {option} with id {id}."}
+
+        return 200, list(reservations)
+
+    except Exception as e:
+        return 500, {"message": f"An unexpected error occurred: {e}"}
