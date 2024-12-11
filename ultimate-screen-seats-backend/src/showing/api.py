@@ -5,7 +5,7 @@ from cinema_room.models import CinemaRoom
 from core.schemas import MessageSchema
 from movie.models import Movie
 
-from .schemas import ShowingSchema, ShowingCreateSchema
+from .schemas import ShowingSchema, ShowingCreateSchema, ShowingUpdateSchema
 from .models import Showing
 
 import helpers
@@ -63,3 +63,38 @@ def get_showing(request, showing_id: int):
         return 404, {"message": {f"Showing with id {showing_id} doesn't exist."}}
     except Exception as e:
         return 500, {"message": "An unexpected error ocurred during fetching showings."}
+    
+
+@router.patch('/{showing_id}', response={200: ShowingSchema, 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
+def update_showing(request, showing_id: int, payload: ShowingUpdateSchema):
+    """Update an existing showing by `showing_id`."""
+
+    try:
+        showing = Showing.objects.get(id=showing_id)
+
+        if payload.movie_id:
+            try:
+                movie = Movie.objects.get(id=payload.movie_id)
+                showing.movie = movie
+            except Movie.DoesNotExist:
+                return 404, {"message": f"Movie with id {payload.movie_id} doesn't exist."}
+
+        if payload.cinema_room_id:
+            try:
+                cinema_room = CinemaRoom.objects.get(id=payload.cinema_room_id)
+                showing.cinema_room = cinema_room
+            except CinemaRoom.DoesNotExist:
+                return 404, {"message": f"Cinema room with id {payload.cinema_room_id} doesn't exist."}
+
+        for attr, value in payload.dict(exclude_unset=True).items():
+            if attr not in ("movie_id", "cinema_room_id"):
+                setattr(showing, attr, value)
+
+        showing.save()
+
+        return 200, showing
+
+    except Showing.DoesNotExist:
+        return 404, {"message": f"Showing with id {showing_id} doesn't exist."}
+    except Exception as e:
+        return 500, {"message": "An unexpected error occurred during updating the showing."}
