@@ -13,9 +13,8 @@ router = Router()
 
 @router.post('', response={201: ReservationSchema, 400: MessageSchema, 404: MessageSchema}, auth=helpers.auth_required)
 def create_reservation(request, payload: ReservationCreateSchema):
-    """
-    Create a reservation for a specific seat
-    """
+    """Create a reservation for a specific seat"""
+
     try:
         user = request.user
 
@@ -38,5 +37,17 @@ def create_reservation(request, payload: ReservationCreateSchema):
         return 201, reservation
     except Showing.DoesNotExist:
         return 404, {"message": f"Showing with id {payload.showing_id} doesn't exist."}
+    except Exception as e:
+        return 400, {"message": f"An unexpected error occurred: {e}"}
+    
+
+@router.get('', response={200: list[ReservationSchema], 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
+def get_reservations(request):
+    try:
+        reservations = Reservation.objects.all()
+
+        return 200, reservations
+    except Reservation.DoesNotExist:
+        return 404, {"message": "Reservations doen't exist."}
     except Exception as e:
         return 400, {"message": f"An unexpected error occurred: {e}"}
