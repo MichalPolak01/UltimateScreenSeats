@@ -30,9 +30,9 @@ def create_showing(request, payload: ShowingCreateSchema):
 
         return 201, showing
     except Movie.DoesNotExist:
-        return 404, {"message": {f"Movie with id {payload.movie_id} doesn't exist."}}
+        return 404, {"message": f"Movie with id {payload.movie_id} doesn't exist."}
     except CinemaRoom.DoesNotExist:
-        return 404, {"message": {f"Cinema room with id {payload.cinema_room_id} doesn't exist."}}
+        return 404, {"message": f"Cinema room with id {payload.cinema_room_id} doesn't exist."}
     except Exception as e:
         traceback.print_exc()
         return 500, {"message": "An unexpected error ocurred during creating showing."}
@@ -47,7 +47,7 @@ def get_showings(request):
 
         return 200, showings
     except Showing.DoesNotExist:
-        return 404, {"message": {f"Showings doesn't exist."}}
+        return 404, {"message": f"Showings doesn't exist."}
     except Exception as e:
         return 500, {"message": "An unexpected error ocurred during fetching showings."}
     
@@ -60,7 +60,7 @@ def get_showing(request, showing_id: int):
 
         return 200, showing
     except Showing.DoesNotExist:
-        return 404, {"message": {f"Showing with id {showing_id} doesn't exist."}}
+        return 404, {"message": f"Showing with id {showing_id} doesn't exist."}
     except Exception as e:
         return 500, {"message": "An unexpected error ocurred during fetching showings."}
     
@@ -98,3 +98,19 @@ def update_showing(request, showing_id: int, payload: ShowingUpdateSchema):
         return 404, {"message": f"Showing with id {showing_id} doesn't exist."}
     except Exception as e:
         return 500, {"message": "An unexpected error occurred during updating the showing."}
+
+
+@router.delete('/{showing_id}', response={200: MessageSchema, 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
+def remove_showing(request, showing_id: int):
+    """Remove a single showing by `showing_id`"""
+
+    try:
+        showing = Showing.objects.get(id=showing_id)
+
+        showing.delete()
+
+        return 200, {"message": f"Showing {showing_id} removed successfully."}
+    except Showing.DoesNotExist:
+        return 404, {"message": f"Showing with id {showing_id} doesn't exist."}
+    except Exception as e:
+        return 500, {"message": "An unexpected error ocurred during fetching showings."}
