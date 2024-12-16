@@ -27,8 +27,11 @@ export default function NavbarAccount() {
             <p className="font-semibold">Zalogowano jako</p>
             <p className="font-semibold">{auth.username}</p>
           </DropdownItem>
+          <DropdownItem key="reservations" href="/reservations">
+            Rezerwacje
+          </DropdownItem>
           <DropdownItem key="settings" href="/profile">
-            Ustawienia
+            Ustawienia Konta
           </DropdownItem>
           <DropdownItem key="logout" color="danger" onClick={handleLogout}>
             Wyloguj się
