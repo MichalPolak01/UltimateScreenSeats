@@ -18,7 +18,7 @@ interface AuthContextProps {
 
 const AuthContext = createContext<AuthContextProps | null>(null)
 
-const LOGIN_REDIRECT_URL = "/home"
+const LOGIN_REDIRECT_URL = "/"
 const LOGOUT_REDIRECT_URL = "/"
 const LOGIN_REQUIRED_URL = "/login"
 
