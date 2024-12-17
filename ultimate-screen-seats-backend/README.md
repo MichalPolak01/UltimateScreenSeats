@@ -21,7 +21,7 @@ Clone the repository to your local machine:
 
 Run the following command to build the Docker image:
 
-`docker build -t image-name ./src` 
+`docker build -t image-name .` 
 
 -   `image-name` – the name you want to assign to the image.
 
@@ -51,7 +51,7 @@ If you make changes to your code and need to update the Docker image:
     
 2.  Rebuild the Docker image:
        
-    `docker build -t image-name ./src` 
+    `docker build -t image-name .` 
     
 3.  Start a new container with the updated image:
         
