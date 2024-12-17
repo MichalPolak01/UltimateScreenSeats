@@ -9,6 +9,12 @@ class Movie(models.Model):
     age_classification = models.IntegerField(default=0)
     image = models.CharField(max_length=255)
     release_date = models.DateField(blank=True, null=True)
+    
+    background_image = models.CharField(max_length=255, default="")
+    trailer_url = models.CharField(max_length=255, default="")
+    cast = models.TextField(default="")
+    director = models.CharField(max_length=255, default="")
+
 
     def __str__(self):
         return self.title
