@@ -11,6 +11,7 @@ interface AuthContextProps {
     authToken: string | null
     username: string
     role: string
+    userId: number | null
     login: (username?: string, role?: string, authToken?: string, refreshToken?: string) => void
     logout: () => void
     loginRequired: () => void
@@ -25,7 +26,7 @@ const LOGIN_REQUIRED_URL = "/login"
 const LOCAL_TOKEN_KEY = "auth-token"
 const LOCAL_USERNAME_KEY = "username"
 const LOCAL_ROLE_KEY = "role"
-
+const LOCAL_USER_ID_KEY = "user-id"
 
 interface AuthProviderProps {
     children: React.ReactNode
@@ -35,26 +36,32 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [username, setUsername] = useState("");
     const [role, setRole] = useState("");
-    const [authToken, setAuthToken] = useState<string | null>(null)
+    const [userId, setUserId] = useState<number | null>(null);
+    const [authToken, setAuthToken] = useState<string | null>(null);
 
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
     useEffect(() => {
-
         const checkToken = async () => {
             const token = localStorage.getItem(LOCAL_TOKEN_KEY);
 
             if (token) {
                 if (isTokenExpired(token)) {
                     loginRequired();
-
                     return;
                 }
 
                 setIsAuthenticated(true);
                 setAuthToken(token);
+
+                const decodedToken = decodeToken(token);
+                const userIdFromToken = decodedToken?.user_id;
+                if (userIdFromToken) {
+                    setUserId(userIdFromToken);
+                    localStorage.setItem(LOCAL_USER_ID_KEY, String(userIdFromToken));
+                }
             } else {
                 loginRequired();
 
@@ -82,7 +89,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
             setToken(authToken);
             setAuthToken(authToken);
             setIsAuthenticated(true);
+
+            const decodedToken = decodeToken(authToken);
+            const userIdFromToken = decodedToken?.user_id;
+            if (userIdFromToken) {
+                setUserId(userIdFromToken);
+                localStorage.setItem(LOCAL_USER_ID_KEY, String(userIdFromToken));
+            }
         }
+
         if (refreshToken) {
             setRefreshToken(refreshToken);
         }
@@ -112,7 +127,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         } else {
             router.replace(LOGIN_REDIRECT_URL);
         }
-    }
+    };
 
     const logout = () => {
         setIsAuthenticated(false);
@@ -120,6 +135,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         deleteServerTokens();
         localStorage.removeItem(LOCAL_USERNAME_KEY);
         localStorage.removeItem(LOCAL_ROLE_KEY);
+        localStorage.removeItem(LOCAL_USER_ID_KEY);
 
         router.replace(LOGOUT_REDIRECT_URL);
     }
@@ -130,13 +146,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
         deleteServerTokens();
         localStorage.removeItem(LOCAL_USERNAME_KEY);
         localStorage.removeItem(LOCAL_ROLE_KEY);
+        localStorage.removeItem(LOCAL_USER_ID_KEY);
         const loginWithNextUrl = `${LOGIN_REQUIRED_URL}?next=${pathname}`;
 
         router.replace(loginWithNextUrl);
-    }
+    };
+
+    const decodeToken = (token: string) => {
+        try {
+            const payload = token.split(".")[1];
+            const decoded = JSON.parse(atob(payload));
+            return decoded;
+        } catch (e) {
+            return null;
+        }
+    };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, authToken, login, logout, loginRequired, username, role }}>
+        <AuthContext.Provider value={{ isAuthenticated, authToken, login, logout, loginRequired, username, role, userId }}>
             {children}
         </AuthContext.Provider>
     )

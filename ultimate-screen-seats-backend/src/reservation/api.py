@@ -42,14 +42,18 @@ def create_reservation(request, payload: ReservationCreateSchema):
     
 
 @router.get('', response={200: list[ReservationSchema], 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
-def get_reservations(request):
-    """Fetch list of reservations"""
+def get_reservations(request, user_id: int = None):
+    """Fetch list of reservations, optionally filtered by user"""
     try:
-        reservations = Reservation.objects.all()
+        if user_id:
+            reservations = Reservation.objects.filter(user_id=user_id)
+        else:
+            reservations = Reservation.objects.all()
 
-        return 200, reservations
-    except Reservation.DoesNotExist:
-        return 404, {"message": "Reservations doen't exist."}
+        if not reservations.exists():
+            return 404, {"message": "No reservations found."}
+
+        return 200, list(reservations)
     except Exception as e:
         return 400, {"message": f"An unexpected error occurred: {e}"}
     
