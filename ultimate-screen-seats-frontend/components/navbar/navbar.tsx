@@ -54,6 +54,20 @@ export const Navbar = () => {
         </ul>
       </NavbarContent>
 
+    <NavbarItem>
+      <NextLink
+        className={clsx(
+          linkStyles({ color: "foreground" }),
+          "data-[active=true]:text-primary data-[active=true]:font-medium",
+        )}
+        color="foreground"
+        href="/showing/2" 
+      >
+        Przejdź do Pokazu 2
+      </NextLink>
+    </NavbarItem>
+
+
       <NavbarContent className="hidden sm:flex basis-1/5 sm:basis-full" justify="end">
         <ThemeSwitch />
         {auth.isAuthenticated?

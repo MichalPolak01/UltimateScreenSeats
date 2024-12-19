@@ -1,4 +1,4 @@
-"use server"
+"use server";
 
 import { NextResponse } from "next/server";
 import ApiProxy from "../proxy";
@@ -21,9 +21,9 @@ export async function GET(request: Request) {
         }
 
         return NextResponse.json(data, { status });
-    } catch (error) {
+    } catch (error: any) {
         console.error("Błąd przy pobieraniu rezerwacji:", error);
-        return NextResponse.json({ error: 'Błąd przy pobieraniu rezerwacji.' }, { status: 500 });
+        return NextResponse.json({ error: error.message || 'Błąd przy pobieraniu rezerwacji.' }, { status: 500 });
     }
 }
 
@@ -43,8 +43,8 @@ export async function DELETE(request: Request) {
         } else {
             return NextResponse.json({ error: error?.message || "Nie udało się usunąć rezerwacji." }, { status });
         }
-    } catch (error) {
+    } catch (error: any) {
         console.error("Błąd przy usuwaniu rezerwacji:", error);
-        return NextResponse.json({ error: "Błąd przy usuwaniu rezerwacji." }, { status: 500 });
+        return NextResponse.json({ error: error.message || "Błąd przy usuwaniu rezerwacji." }, { status: 500 });
     }
 }
