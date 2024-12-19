@@ -16,9 +16,11 @@ export default function Showing({ id }: { id: number }) {
       const res = await fetch(`/api/showing/${id}`)
       const data = await res.json()
 
+      console.log(data.cinema_room.seat_layout)
+
       if (res.ok) {
-        if (Array.isArray(data)) {
-          setSeatLayout(data)
+        if (Array.isArray(data.cinema_room.seat_layout)) {
+          setSeatLayout(data.cinema_room.seat_layout)
         } else {
           setError("Odpowiedź z serwera jest niepoprawna.")
         }

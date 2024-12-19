@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react"; 
+
 import Showing from "@/components/showing/Showing";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
