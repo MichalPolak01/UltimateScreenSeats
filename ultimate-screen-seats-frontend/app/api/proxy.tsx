@@ -92,4 +92,15 @@ export default class ApiProxy {
 
         return ApiProxy.handleFetch<T>(endpoint, requestOptions);
     }
+
+    static async delete<T>(endpoint: string, requireAuth: boolean): Promise<ApiResponse<T>> {
+        const headers = await ApiProxy.getHeaders(requireAuth);
+    
+        const requestOptions: RequestInit = {
+            method: "DELETE",
+            headers,
+        };
+    
+        return ApiProxy.handleFetch<T>(endpoint, requestOptions);
+    }    
 }

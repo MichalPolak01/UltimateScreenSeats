@@ -26,3 +26,25 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: 'Błąd przy pobieraniu rezerwacji.' }, { status: 500 });
     }
 }
+
+export async function DELETE(request: Request) {
+    const url = new URL(request.url);
+    const reservationId = url.pathname.split("/").pop();
+
+    if (!reservationId) {
+        return NextResponse.json({ error: "Brak ID rezerwacji w zapytaniu." }, { status: 400 });
+    }
+
+    try {
+        const { status, error } = await ApiProxy.delete(`${DJANGO_API_RESERVATIONS_URL}/${reservationId}`, true);
+
+        if (status === 200) {
+            return NextResponse.json({ message: "Rezerwacja została usunięta." }, { status });
+        } else {
+            return NextResponse.json({ error: error?.message || "Nie udało się usunąć rezerwacji." }, { status });
+        }
+    } catch (error) {
+        console.error("Błąd przy usuwaniu rezerwacji:", error);
+        return NextResponse.json({ error: "Błąd przy usuwaniu rezerwacji." }, { status: 500 });
+    }
+}

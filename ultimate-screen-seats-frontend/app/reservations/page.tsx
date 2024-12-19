@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Reservation } from "@/app/interfaces/reservation";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { Button } from "@nextui-org/button";
+import ApiProxy from "@/app/api/proxy";
 
 const RESERVATIONS_URL = "/api/reservation";
 
@@ -13,45 +14,68 @@ export default function Reservations() {
     const [error, setError] = useState<string | null>(null);
     const { authToken, userId } = useAuth();
 
+    const fetchReservations = async () => {
+        if (!authToken || !userId) {
+            setError("Nieprawidłowy token lub brak userId.");
+            return;
+        }
+        const url = `${RESERVATIONS_URL}?user_id=${userId}`;
+
+        try {
+            const { data, status, error } = await ApiProxy.get(url, true);
+
+            if (status === 200) {
+                setReservations(Array.isArray(data) ? data : []);
+            } else {
+                setError(error?.message || "Wystąpił błąd przy pobieraniu rezerwacji.");
+            } 
+        } catch (err) {
+            console.error("Błąd podczas pobierania rezerwacji:", err);
+            setError("Wystąpił błąd podczas pobierania danych.");
+        }
+    };
+
     useEffect(() => {
-        const fetchReservations = async () => {
-            if (!authToken || !userId) {
-                setError("Nieprawidłowy token lub brak userId.");
-                return;
-            }
-            const url = `${RESERVATIONS_URL}?user_id=${userId}`;
-
-            try {
-                const response = await fetch(url, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${authToken}`,
-                    },
-                });
-
-                if (!response.ok) {
-                    const data = await response.json();
-                    setError(data.error || "Wystąpił błąd przy pobieraniu rezerwacji.");
-                } else {
-                    const data = await response.json();
-                    setReservations(data);
-                }
-            } catch (err) {
-                setError("Wystąpił błąd podczas pobierania danych.");
-            }
-        };
-
         fetchReservations();
     }, [authToken, userId]);
 
+    const handleDelete = async (reservationId: number) => {
+        const url = `/api/reservation/${reservationId}`;
+        
+        try {
+            const { status, error } = await ApiProxy.delete(url, true);
+    
+            if (status === 200) {
+                setReservations((prevReservations) =>
+                    prevReservations.filter((reservation) => reservation.id !== reservationId)
+                );
+            } else {
+                setError(error?.message || "Nie udało się usunąć rezerwacji. Spróbuj ponownie.");
+            }
+        } catch (err) {
+            console.error("Błąd podczas usuwania rezerwacji:", err);
+            setError("Błąd podczas usuwania rezerwacji.");
+        }
+    };
+    
     if (error) {
         return (
-            <div className="flex justify-center items-center h-screen bg-gray-800">
-                <div className="bg-red-500 text-white p-4 rounded-md">
-                    <h2 className="font-semibold">Błąd:</h2>
-                    <p>{error}</p>
-                </div>
+            <div className="flex justify-center items-center h-screen">
+                <Card className="w-full max-w-lg p-8 bg-red-500 text-white rounded-lg shadow-lg">
+                    <CardHeader className="p-2 flex-col items-start">
+                        <h1 className="text-2xl font-semibold mb-2">Wystąpił błąd</h1>
+                    </CardHeader>
+                    <CardBody>
+                        <p className="text-lg mb-4">{error}</p>
+                        <Button
+                            color="default"
+                            onClick={() => window.location.reload()}
+                            className="w-full mt-4"
+                        >
+                            Odśwież stronę
+                        </Button>
+                    </CardBody>
+                </Card>
             </div>
         );
     }
@@ -81,7 +105,12 @@ export default function Reservations() {
                                         <p className="mb-4">
                                             <strong>Cena:</strong> {reservation.showing.ticket_price} PLN
                                         </p>
-                                        <Button className="w-full" color="default" size="sm">
+                                        <Button
+                                            className="w-full"
+                                            color="danger"
+                                            size="sm"
+                                            onClick={() => handleDelete(reservation.id)}
+                                        >
                                             Zrezygnuj z rezerwacji
                                         </Button>
                                     </CardBody>
