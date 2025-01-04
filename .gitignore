@@ -1,8 +1,25 @@
+# Ignoruj pliki i foldery generowane przez Node.js (dla Next.js frontend)
+ultimate-screen-seats-frontend/node_modules/
+ultimate-screen-seats-frontend/.next/
+ultimate-screen-seats-frontend/out/
+ultimate-screen-seats-frontend/.env.local
+ultimate-screen-seats-frontend/.env.*.local
 
-/ultimate-screen-seats-backend/src/authentication/__pycache__
-ultimate-screen-seats-backend/src/authentication/__pycache__/api.cpython-311.pyc
-/ultimate-screen-seats-backend/src/authentication
-/ultimate-screen-seats-backend/src/core
-/ultimate-screen-seats-backend/src/core
-/ultimate-screen-seats-backend/src
-/ultimate-screen-seats-backend
+# Ignoruj pliki i foldery generowane przez Django (dla Django backend)
+ultimate-screen-seats-backend/__pycache__/
+ultimate-screen-seats-backend/*.py[cod]
+ultimate-screen-seats-backend/db.sqlite3
+ultimate-screen-seats-backend/media/
+ultimate-screen-seats-backend/staticfiles/
+ultimate-screen-seats-backend/.env
+
+# Ignoruj systemowe pliki tymczasowe
+.DS_Store
+Thumbs.db
+
+# Ignoruj pliki konfiguracyjne IDE i edytorów (np. VS Code)
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
