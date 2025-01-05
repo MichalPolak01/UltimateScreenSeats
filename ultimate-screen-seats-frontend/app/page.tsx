@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 
 import { useAuth } from "@/providers/authProvider";
 import { showToast } from "@/lib/showToast";
-import MovieCard from '@/components/movieCard';
+import MovieCard from '@/components/movie-card/movieCard';
 import FilterCarousel from "@/components/movies/filterCarousel";
 
 const MOVIES_URL = "api/movies";

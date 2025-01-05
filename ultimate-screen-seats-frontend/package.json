@@ -26,6 +26,7 @@
 		"@nextui-org/system": "2.4.3",
 		"@nextui-org/tabs": "^2.2.5",
 		"@nextui-org/theme": "2.4.1",
+		"@nextui-org/tooltip": "^2.2.6",
 		"@react-aria/ssr": "3.9.7",
 		"@react-aria/visually-hidden": "3.8.18",
 		"clsx": "2.1.1",
