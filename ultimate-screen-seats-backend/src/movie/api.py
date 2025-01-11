@@ -35,17 +35,18 @@ def get_movies(request):
         return 500, {"message": "An unexpected error ocurred during fetching movies."}
     
 
-@router.get('{movie_id}', response={200: list[MovieSchema], 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
+@router.get('{movie_id}', response={200: MovieSchema, 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
 def get_movie(request, movie_id: int):
     """Fetch a single movie by `movie_id`"""
 
     try:
-        movie = Movie.objects.filter(id=movie_id)
+        movie = Movie.objects.get(id=movie_id)
 
         return 200, movie
     except Movie.DoesNotExist:
         return 404, {"message": f"Movie with id {movie_id} not found."}
     except Exception as e:
+        traceback.print_exc()
         return 500, {"message": f"An unexpected error ocurred during fetching movie with id {movie_id}."}
     
 
