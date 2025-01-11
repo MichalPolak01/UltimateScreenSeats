@@ -3,6 +3,11 @@
 import { useEffect, useState } from "react"
 import { Card, CardBody, CardHeader } from "@nextui-org/card"
 import { Button } from "@nextui-org/button"
+import ApiProxy from "@/app/api/proxy";
+import './Showing.tsx.css';
+
+const SHOWING_URL = "/api/showing";
+const RESERVATIONS_URL = "/api/reservation";
 
 type SeatLayout = number[][]
 
@@ -13,40 +18,67 @@ export default function Showing({ id }: { id: number }) {
 
   const fetchAvailableSeats = async () => {
     try {
-      const res = await fetch(`/api/showing/${id}`)
-      const data = await res.json()
-
-      console.log(data.cinema_room.seat_layout)
+      const res = await fetch(`${SHOWING_URL}/${id}`);
+      const data = await res.json();
 
       if (res.ok) {
-        if (Array.isArray(data.cinema_room.seat_layout)) {
-          setSeatLayout(data.cinema_room.seat_layout)
+        const reservation = data;
+        if (reservation?.cinema_room?.seat_layout) {
+          setSeatLayout(reservation.cinema_room.seat_layout);
         } else {
-          setError("Odpowiedź z serwera jest niepoprawna.")
+          setError("Brak układu sali w odpowiedzi serwera.");
         }
       } else {
-        setError(data?.message || "Błąd podczas pobierania dostępnych miejsc.")
+        setError(data?.message || "Błąd podczas pobierania dostępnych miejsc.");
       }
     } catch (err) {
-      console.error("Błąd podczas pobierania dostępnych miejsc:", err)
-      setError("Wystąpił błąd podczas pobierania danych.")
+      console.error("Błąd podczas pobierania dostępnych miejsc:", err);
+      setError("Wystąpił błąd podczas pobierania danych.");
     }
-  }
-
+  };
+  
   const toggleSeatSelection = (row: number, column: number) => {
     const seatIndex = selectedSeats.findIndex(
       (seat) => seat.row === row && seat.column === column
-    )
+    );
     if (seatIndex >= 0) {
-      setSelectedSeats((prev) => prev.filter((_, index) => index !== seatIndex))
+      setSelectedSeats((prev) => prev.filter((_, index) => index !== seatIndex));
     } else {
-      setSelectedSeats((prev) => [...prev, { row, column }])
+      setSelectedSeats((prev) => [...prev, { row, column }]);
     }
-  }
+  };
+  
+  const reserveSeats = async () => {
+    if (selectedSeats.length === 0) {
+      setError("Nie wybrano żadnych miejsc.");
+      return;
+    }
+
+    try {
+      for (const seat of selectedSeats) {
+        const { status, error } = await ApiProxy.post(RESERVATIONS_URL, {
+          showing_id: id,
+          seat_row: seat.row + 1,
+          seat_column: seat.column + 1,
+        }, true);
+
+        if (status !== 201) {
+          setError(error?.message || "Błąd przy rezerwowaniu miejsca.");
+          return;
+        }
+      }
+
+      setSelectedSeats([]);
+      setError(null);
+    } catch (err) {
+      console.error("Błąd podczas rezerwacji:", err);
+      setError("Wystąpił błąd podczas rezerwacji.");
+    }
+  };
 
   useEffect(() => {
-    fetchAvailableSeats()
-  }, [id])
+    fetchAvailableSeats();
+  }, [id]);
 
   if (error) {
     return (
@@ -79,52 +111,65 @@ export default function Showing({ id }: { id: number }) {
         </CardHeader>
         <CardBody className="overflow-hidden flex flex-col">
           {seatLayout ? (
-            <div className="grid gap-4">
-              {seatLayout.map((row, rowIndex) => (
-                <div key={rowIndex} className="flex justify-center space-x-2">
-                  {row.map((seat, columnIndex) => {
-                    if (seat === -1) {
-                      return (
-                        <div
-                          key={columnIndex}
-                          className="w-8 h-8 bg-transparent"
-                          style={{ visibility: "hidden" }}
-                        ></div>
+            <div className="flex flex-col items-center">
+              <div className="w-full h-3 bg-black mb-8 flex justify-center items-center text-white font-bold text-lg rounded-lg">
+              </div>
+              <div className="grid gap-8">
+                {seatLayout.map((row, rowIndex) => (
+                  <div key={rowIndex} className="flex justify-center space-x-8">
+                    {row.map((seat, columnIndex) => {
+                      if (seat === -1) {
+                        return (
+                          <div
+                            key={columnIndex}
+                            className="w-16 h-16 bg-transparent"
+                            style={{ visibility: "hidden" }}
+                          ></div>
+                        )
+                      }
+
+                      const isSelected = selectedSeats.some(
+                        (selectedSeat) =>
+                          selectedSeat.row === rowIndex && selectedSeat.column === columnIndex
                       )
-                    }
 
-                    const isSelected = selectedSeats.some(
-                      (selectedSeat) =>
-                        selectedSeat.row === rowIndex && selectedSeat.column === columnIndex
-                    )
+                      const isOccupied = seat === 1
+                      const isFree = seat === 0
 
-                    const isOccupied = seat === 1
+                      let seatClass = "cursor-pointer w-16 h-16"
+                      if (isOccupied) {
+                        seatClass = "bg-gray-500 cursor-not-allowed shadow-xl"
+                      } else if (isSelected) {
+                        seatClass = "bg-blue-500"
+                      } else if (isFree) {
+                        seatClass = "bg-green-500"
+                      }
 
-                    const seatClass = isOccupied
-                      ? "bg-red-500 cursor-not-allowed"
-                      : isSelected
-                      ? "bg-blue-500"
-                      : "bg-green-500"
-
-                    return (
-                      <input
-                        type="checkbox"
-                        key={columnIndex}
-                        disabled={isOccupied}
-                        checked={isSelected}
-                        onChange={() => toggleSeatSelection(rowIndex, columnIndex)}
-                        className={`w-8 h-8 cursor-pointer ${seatClass}`}
-                      />
-                    )
-                  })}
-                </div>
-              ))}
+                      return (
+                        <div className="flex items-center justify-center">
+                          <input
+                            type="checkbox"
+                            key={columnIndex}
+                            disabled={isOccupied || seat === -1}
+                            checked={isSelected}
+                            onChange={() => toggleSeatSelection(rowIndex, columnIndex)}
+                            className={`checkbox w-10 h-10 cursor-pointer appearance-none border-2 border-gray-500 rounded-lg ${seatClass}`}
+                          />
+                        </div>
+                      )
+                    })}
+                  </div>
+                ))}
+              </div>
             </div>
           ) : (
             <p className="text-center text-gray-400">Ładowanie układu sali...</p>
           )}
         </CardBody>
       </Card>
+      <Button onClick={reserveSeats} className="mt-6 w-full max-w-lg">
+        Zarezerwuj wybrane miejsca
+      </Button>
     </div>
   )
 }
