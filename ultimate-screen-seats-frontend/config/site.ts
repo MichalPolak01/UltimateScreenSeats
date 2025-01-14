@@ -4,38 +4,15 @@ export const siteConfig = {
   name: "UltimateScreenSeats",
   description: "Browse movies and book your tickets!",
   navItems: [
+    /*
     {
       label: "Home",
       href: "/home",
       authRequired: true
-    },
-    {
-      label: "Quizy",
-      href: "/quizzes",
-      authRequired: true
-    },
-    {
-      label: "Stwórz quiz",
-      href: "/quizzes/wizard",
-      authRequired: true
-    },
+    }
+    */
   ],
   navMenuItems: [
-    {
-      label: "Home",
-      href: "/home",
-      authRequired: true
-    },
-    {
-      label: "Quizy",
-      href: "/quizzes",
-      authRequired: true
-    },
-    {
-      label: "Stwórz quiz",
-      href: "/quizzes/wizard",
-      authRequired: true
-    },
     {
       label: "Ustwaienia profilowe",
       href: "/profile",

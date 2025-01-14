@@ -40,7 +40,7 @@ export default function Reservations() {
     }, [authToken, userId]);
 
     const handleDelete = async (reservationId: number) => {
-        const url = `/api/reservation/${reservationId}`;
+        const url = `${RESERVATIONS_URL}/${reservationId}`;
         
         try {
             const { status, error } = await ApiProxy.delete(url, true);
