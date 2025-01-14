@@ -53,12 +53,12 @@ export default function Home() {
 
   return (
     <div>
-      <div className="relative h-[40svh] p-[4rem] w-full rounded-b-2xl overflow-hidden flex items-end justify-center">
+      <div className="relative h-[45svh] p-[4rem] w-full rounded-b-2xl overflow-hidden flex items-end justify-center">
         <Image
           fill
           alt=""
           className="absolute inset-0 object-cover w-full h-full"
-          src="/images/slider.jpg"
+          src="/images/cinema.jpg"
         />
 
         <div className="absolute inset-0 bg-black opacity-50 flex flex-col" />
