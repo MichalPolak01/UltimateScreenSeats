@@ -34,7 +34,7 @@ export const Navbar = () => {
             <p className="font-bold text-inherit text-primary-500">UltimateScreenSeats</p>
           </NextLink>
         </NavbarBrand>
-        {/* 
+        
         <ul className="hidden sm:flex gap-4 justify-start ml-2">
           {siteConfig.navItems.map((item) => (
             (!item.authRequired || auth.isAuthenticated) && (
@@ -53,7 +53,7 @@ export const Navbar = () => {
             )
           ))}
         </ul>
-        */}
+       
       </NavbarContent>
 
     <NavbarItem>

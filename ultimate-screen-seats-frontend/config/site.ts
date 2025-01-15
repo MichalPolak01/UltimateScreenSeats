@@ -10,10 +10,6 @@ export const siteConfig = {
       authRequired: true
     },
     {
-      href: "/",
-      authRequired: false
-    },
-    {
       label: "Seanse",
       href: "/showings",
       authRequired: false

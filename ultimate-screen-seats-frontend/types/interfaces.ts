@@ -18,3 +18,18 @@ interface Genre {
     id: number
     name: string
 }
+
+interface MoviePreview {
+    id: number
+    title: string
+    image: string
+    movie_length: number
+    age_classification: number
+}
+
+interface ShowingList {
+    id: number
+    date_from: string
+    date_to: string
+    movie: MoviePreview
+}
