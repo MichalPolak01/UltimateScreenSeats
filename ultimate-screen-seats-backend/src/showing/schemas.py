@@ -59,3 +59,23 @@ def validate_date(value):
     if value <= datetime.now():
         raise ValueError("The date must be in the future.")
     return value
+
+
+class MovieSchemaList(Schema):
+    id: int
+    title: str
+    image: str
+    movie_length: int
+    age_classification: int
+
+    class Config:
+        orm_mode = True
+
+class ShowingSchemaList(Schema):
+    id: int
+    date_from: datetime
+    date_to: datetime
+    movie: MovieSchemaList
+
+    class Config:
+        orm_mode = True

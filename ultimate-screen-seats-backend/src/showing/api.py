@@ -1,12 +1,16 @@
 import traceback
+from typing import List
 from ninja_extra import Router
+from datetime import datetime
+from django.utils import timezone
+from django.utils.timezone import make_aware
 
 from cinema_room.models import CinemaRoom
 from core.schemas import MessageSchema
 from movie.models import Movie
 from reservation.models import Reservation
 
-from .schemas import ShowingSchema, ShowingCreateSchema, ShowingUpdateSchema
+from .schemas import ShowingSchema, ShowingCreateSchema, ShowingSchemaList, ShowingUpdateSchema
 from .models import Showing
 
 import helpers
@@ -44,13 +48,79 @@ def get_showings(request):
     """Fetch list of schowings"""
 
     try:
-        showings = Showing.objects.all()
+        now = make_aware(datetime.now())
+
+        showings = Showing.objects.filter(date__gt=now).order_by('date')
 
         return 200, showings
     except Showing.DoesNotExist:
         return 404, {"message": f"Showings doesn't exist."}
     except Exception as e:
         return 500, {"message": "An unexpected error ocurred during fetching showings."}
+    
+    
+@router.get('/list', response={200: List[ShowingSchemaList], 404: MessageSchema, 500: MessageSchema})
+def get_showings(request, start_date: datetime = None, end_date: datetime = None):
+    """Fetch showings with filtering by date range (default: from now to the end)"""
+
+    try:
+        if not start_date:
+            start_date = timezone.now()
+
+        if not end_date:
+            end_date = timezone.make_aware(datetime(2100, 12, 31, 23, 59, 59))
+
+        if timezone.is_naive(start_date):
+            start_date = timezone.make_aware(start_date)
+
+        if timezone.is_naive(end_date):
+            end_date = timezone.make_aware(end_date)
+
+        showings = Showing.objects.filter(
+            date__gte=start_date,
+            date__lte=end_date
+        ).order_by('date')
+
+        if not showings:
+            return 404, {"message": "No showings found within the specified date range."}
+
+        movie_showings = {}
+        for showing in showings:
+            movie_id = showing.movie.id
+            if movie_id not in movie_showings:
+                movie_showings[movie_id] = {
+                    'movie': showing.movie,
+                    'date_from': showing.date,
+                    'date_to': showing.date,
+                    'ticket_price': showing.ticket_price
+                }
+            else:
+                movie_showings[movie_id]['date_from'] = min(movie_showings[movie_id]['date_from'], showing.date)
+                movie_showings[movie_id]['date_to'] = max(movie_showings[movie_id]['date_to'], showing.date)
+
+        result = []
+        for movie_id, data in movie_showings.items():
+            movie_data = data['movie']
+            result.append({
+                "id": movie_data.id,
+                "movie": {
+                    "id": movie_data.id,
+                    "title": movie_data.title,
+                    "image": movie_data.image,
+                    "movie_length": movie_data.movie_length,
+                    "age_classification": movie_data.age_classification
+                },
+                "cinema_room": None,
+                "date_from": data['date_from'],
+                "date_to": data['date_to'],
+                "ticket_price": str(data['ticket_price'])
+            })
+
+        return 200, result
+
+    except Exception as e:
+        traceback.print_exc()
+        return 500, {"message": "An unexpected error occurred while fetching the showings."}
     
 
 @router.get('/{showing_id}', response={200: ShowingSchema, 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
@@ -142,3 +212,4 @@ def remove_showing(request, showing_id: int):
         return 404, {"message": f"Showing with id {showing_id} doesn't exist."}
     except Exception as e:
         return 500, {"message": "An unexpected error ocurred during fetching showings."}
+    
