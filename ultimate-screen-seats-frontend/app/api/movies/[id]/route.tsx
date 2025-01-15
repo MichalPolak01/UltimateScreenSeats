@@ -12,7 +12,7 @@ export async function GET( request: Request, context: { params: { id: string } }
     const { params } = context;
     const { id } = await params;
 
-    const { data, status } = await ApiProxy.get(`${DJANGO_API_MOVIES_URL}${id}`, true);
+    const { data, status } = await ApiProxy.get(`${DJANGO_API_MOVIES_URL}${id}`, false);
 
     return NextResponse.json(data, { status: status });
 }

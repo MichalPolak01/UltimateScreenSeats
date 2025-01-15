@@ -17,7 +17,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
     const router = useRouter();
 
     const handleGoToMovieDetails =(id: number) => {
-      router.push(`/movie/${id}`)
+      router.push(`/movies/${id}`)
     }
 
     return (

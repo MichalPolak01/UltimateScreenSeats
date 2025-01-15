@@ -22,7 +22,6 @@ export default function MoviePage({ params }: { params: Promise<{ id: string }> 
 
     const auth = useAuth();
 
-
     useEffect(() => {
         const fetchMovieDetails = async () => {
             setLoading(true);
@@ -73,11 +72,10 @@ export default function MoviePage({ params }: { params: Promise<{ id: string }> 
             <div className="max-w-7xl mx-auto mt-[5svh] p-8 lg:h-[85svh] flex lg:flex-row flex-col items-end lg:gap-10 gap-4">
                 <div className="lg:w-2/5 w-full relative lg:h-full sm:h-[36svh] h-[20svh]">
                     <Image
+                        fill
+                        priority
                         alt="Movie image"
-                        className="md:pt-10"
-                        layout="fill"
-                        objectFit="contain"
-                        objectPosition="bottom"
+                        className="md:pt-10 object-contain object-bottom"
                         src={movie.image}
                     />
                 </div>
@@ -93,7 +91,7 @@ export default function MoviePage({ params }: { params: Promise<{ id: string }> 
                         
                         <p className="sm:text-md text-xs flex gap-4 items-center">
                             <LoaderPinwheel className="w-[20px] flex-shrink-0" />
-                            <span className="font-bold">Gatunek:</span> {movie.genre}
+                            <span className="font-bold">Gatunek:</span> {movie.genre.map((g) => g.name).join(', ')}
                         </p>
                         
                         <p className="sm:text-md text-xs flex gap-4 items-center">

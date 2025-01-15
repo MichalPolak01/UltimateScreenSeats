@@ -6,35 +6,35 @@ export const siteConfig = {
   navItems: [
     {
       label: "Home",
-      href: "/home",
-      authRequired: true
+      href: "/",
+      authRequired: false
     },
     {
-      label: "Quizy",
-      href: "/quizzes",
-      authRequired: true
+      label: "Seanse",
+      href: "/showings",
+      authRequired: false
     },
     {
-      label: "Stwórz quiz",
-      href: "/quizzes/wizard",
-      authRequired: true
+      label: "Filmy",
+      href: "/movies",
+      authRequired: false
     },
   ],
   navMenuItems: [
     {
       label: "Home",
-      href: "/home",
-      authRequired: true
+      href: "/",
+      authRequired: false
     },
     {
-      label: "Quizy",
-      href: "/quizzes",
-      authRequired: true
+      label: "Seanse",
+      href: "/showings",
+      authRequired: false
     },
     {
-      label: "Stwórz quiz",
-      href: "/quizzes/wizard",
-      authRequired: true
+      label: "Filmy",
+      href: "/movies",
+      authRequired: false
     },
     {
       label: "Ustwaienia profilowe",
