@@ -4,15 +4,42 @@ export const siteConfig = {
   name: "UltimateScreenSeats",
   description: "Browse movies and book your tickets!",
   navItems: [
-    /*
     {
       label: "Home",
-      href: "/home",
+      href: "/",
       authRequired: true
-    }
-    */
+    },
+    {
+      href: "/",
+      authRequired: false
+    },
+    {
+      label: "Seanse",
+      href: "/showings",
+      authRequired: false
+    },
+    {
+      label: "Filmy",
+      href: "/movies",
+      authRequired: false
+    },
   ],
   navMenuItems: [
+    {
+      label: "Home",
+      href: "/",
+      authRequired: false
+    },
+    {
+      label: "Seanse",
+      href: "/showings",
+      authRequired: false
+    },
+    {
+      label: "Filmy",
+      href: "/movies",
+      authRequired: false
+    },
     {
       label: "Ustwaienia profilowe",
       href: "/profile",

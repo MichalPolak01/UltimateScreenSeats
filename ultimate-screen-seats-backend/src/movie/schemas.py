@@ -1,14 +1,18 @@
 from datetime import date
-from typing import Optional
+from typing import List, Optional
 from ninja import Schema
 from pydantic import fields
 
+
+class GenreSchema(Schema):
+    id: int
+    name: str
 
 class MovieSchema(Schema):
     id: int
     title: str
     description: str
-    genre: str
+    genre: List[GenreSchema]
     movie_length: int
     age_classification: int
     image: str
@@ -24,7 +28,7 @@ class MovieSchema(Schema):
 class MovieCreateSchema(Schema):
     title: str
     description: Optional[str] = None
-    genre: str
+    genre_id: List[int]
     movie_length: int
     age_classification: int
     image: str
@@ -38,7 +42,7 @@ class MovieCreateSchema(Schema):
 class MovieUpdateSchema(Schema):
     title: Optional[str] = None
     description: Optional[str] = None
-    genre: Optional[str] = None
+    genre_id: Optional[List[int]] = None
     movie_length: Optional[int] = None
     age_classification: Optional[int] = None
     image: Optional[str] = None
@@ -47,3 +51,12 @@ class MovieUpdateSchema(Schema):
     trailer_url: Optional[str] = None
     cast: Optional[str] = None
     director: Optional[str] = None
+
+
+
+
+class GenreCreateSchema(Schema):
+    name: str
+
+class MessageSchema(Schema):
+    message: str

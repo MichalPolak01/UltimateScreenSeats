@@ -9,7 +9,7 @@ const protectedRoutes = {
     "/change-password": ['USER', 'TEACHER'],
 };
 
-const publicRoutes = ['/register'];
+// const publicRoutes = ['/register'];
 
 function isTokenExpired(token: string): boolean {
     try {
@@ -24,22 +24,22 @@ function isTokenExpired(token: string): boolean {
 export default async function middleware(request:NextRequest) {
     const path = request.nextUrl.pathname;
     const isProtectedRoute = Object.keys(protectedRoutes).includes(path);
-    const isPublicRoute = publicRoutes.includes(path);
+    // const isPublicRoute = publicRoutes.includes(path);
 
     const cookieStore = await cookies();
     const userRole = cookieStore.get("role")?.value;
     const token = cookieStore.get("auth-token")?.value;
     const isAuthenticated = token && !isTokenExpired(token);
     
-    if (isPublicRoute && isAuthenticated) {
-        return NextResponse.redirect(new URL("/", request.nextUrl));
-    }
+    // if (isPublicRoute && isAuthenticated) {
+    //     return NextResponse.redirect(new URL("/", request.nextUrl));
+    // }
 
     if (isProtectedRoute) {
         const allowedRoles = protectedRoutes[path as keyof typeof protectedRoutes];
 
         if (!userRole || !allowedRoles.includes(userRole) || !isAuthenticated) {
-            return NextResponse.redirect(new URL('/', request.nextUrl));
+            return NextResponse.redirect(new URL('/login', request.nextUrl));
         }
     }
 
