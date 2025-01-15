@@ -39,7 +39,7 @@ def create_showing(request, payload: ShowingCreateSchema):
         return 500, {"message": "An unexpected error ocurred during creating showing."}
     
 
-@router.get('', response={200: list[ShowingSchema], 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
+@router.get('', response={200: list[ShowingSchema], 404: MessageSchema, 500: MessageSchema})
 def get_showings(request):
     """Fetch list of schowings"""
 
