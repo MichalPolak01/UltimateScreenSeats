@@ -27,6 +27,7 @@ interface MoviePreview {
     age_classification: number
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface ShowingList {
     id: number
     date_from: string

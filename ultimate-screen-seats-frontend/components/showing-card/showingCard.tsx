@@ -8,8 +8,6 @@ import { useRouter } from "next/navigation";
 import AgeClassificationIcon from "../movie-card/ageClassification";
 
 
-
-
 interface ShowingCardProps {
     showing: ShowingList
 }

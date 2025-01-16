@@ -50,7 +50,7 @@ export default function Home() {
 
   return (
     <div>
-      <div className="relative h-[40svh] p-[4rem] w-full rounded-b-2xl overflow-hidden flex items-end justify-center">
+      <div className="relative h-[35svh] p-[4rem] w-full rounded-b-2xl overflow-hidden flex items-end justify-center">
         <Image
           fill
           priority
@@ -62,10 +62,10 @@ export default function Home() {
         <div className="absolute inset-0 bg-black opacity-70 flex flex-col" />
           <div className='flex flex-col gap-2'>
             <h1 className="relative z-10 text-primary md:text-6xl text-3xl font-semibold text-center italic">
-              Nasza baza filmów
+              Baza filmów, która Cię zaskoczy
             </h1>
             <h2  className="relative z-10 text-white md:text-2xl text-lg font-light text-center italic">
-              Znajdź coś interesujacego!
+              Najciekawsze tytuły czekają na Ciebie!
             </h2>
           </div>
       </div>
