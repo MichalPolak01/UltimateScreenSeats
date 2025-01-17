@@ -9,10 +9,10 @@ import AgeClassificationIcon from "../movie-card/ageClassification";
 
 
 interface ShowingCardProps {
-    showing: Showing
+    showing: ShowingList
 }
 
-export default function ShowingCard({ showing }: ShowingCardProps) {
+export default function ShowingListCard({ showing }: ShowingCardProps) {
 
     const router = useRouter();
 
@@ -33,7 +33,13 @@ export default function ShowingCard({ showing }: ShowingCardProps) {
           <CardFooter className="flex-col gap-3 content-between pt-1">
             <h2 className="text-primary font-semibold text-xl">{showing.movie.title}</h2>
             <p className="text-default-500 text-small flex items-center gap-1"><Clock size={18} />Time:<span className="font-bold">{showing.movie.movie_length}</span> min</p>
-            <p className="text-default-500 text-small flex items-center gap-3"><CalendarDays size={24} /><span className="font-bold text-danger">{new Date(showing.date).toLocaleString('pl-PL')}</span></p>
+            <p className="text-default-500 text-small flex items-center gap-3">
+                <CalendarDays size={24} />
+                <span>
+                    W kinach od <span className="font-bold text-primary">{new Date(showing.date_from).toLocaleDateString('pl-PL')}</span> 
+                    <br/>do <span className="font-bold text-primary">{new Date(showing.date_to).toLocaleDateString('pl-PL')}</span>
+                </span>
+            </p>
           </CardFooter>
         </Card>
     )

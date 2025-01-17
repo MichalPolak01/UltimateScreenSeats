@@ -5,11 +5,6 @@ export const siteConfig = {
   description: "Browse movies and book your tickets!",
   navItems: [
     {
-      label: "Home",
-      href: "/",
-      authRequired: true
-    },
-    {
       label: "Seanse",
       href: "/showings",
       authRequired: false

@@ -1,5 +1,5 @@
 import traceback
-from typing import List
+from typing import List, Optional
 from ninja_extra import Router
 from datetime import datetime
 from django.utils import timezone
@@ -44,13 +44,16 @@ def create_showing(request, payload: ShowingCreateSchema):
     
 
 @router.get('', response={200: list[ShowingSchema], 404: MessageSchema, 500: MessageSchema})
-def get_showings(request):
+def get_showings(request,  limit: Optional[int] = None):
     """Fetch list of schowings"""
 
     try:
         now = make_aware(datetime.now())
 
         showings = Showing.objects.filter(date__gt=now).order_by('date')
+
+        if limit is not None:
+            showings = showings[:limit]
 
         return 200, showings
     except Showing.DoesNotExist:

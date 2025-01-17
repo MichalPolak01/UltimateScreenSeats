@@ -2,34 +2,33 @@
 
 import { useEffect, useState } from "react";
 import Image from 'next/image'
-import { useSearchParams } from "next/navigation";
 
-// import { useAuth } from "@/providers/authProvider";
 import { showToast } from "@/lib/showToast";
-import MovieCard from '@/components/movie-card/movieCard';
-import FilterCarousel from "@/components/movies/genresCarousel";
+import { useAuth } from "@/providers/authProvider";
+import Carousel from "@/components/carousel/carousel";
 
 const MOVIES_URL = "api/movies";
+const SHOWINGS_URL = "api/showings"
+const RESERVATIONS_URL = "api/reservations"
 
 
 export default function Home() {
   const [movies, setMovies] = useState<Movie[]>([]);
-  const searchParams = useSearchParams();
-  const filter = searchParams.get("filter");
-  const [activeFilter, setActiveFilter] = useState<string>(filter ? filter : "");
+  const [showings, setShowings] = useState<Showing[]>([]);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
 
-  // const auth = useAuth();
+  const auth = useAuth();
 
   useEffect(() => {
-    const fetchMovies = async () => {
+    const fetchLatestMovies = async () => {
       try {
-        const response = await fetch(MOVIES_URL, {
+        const response = await fetch(`${MOVIES_URL}?limit=10`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });
   
         if (response.status === 401) {
-          // auth.loginRequired();
+          auth.loginRequired();
   
           return null;
         }
@@ -48,12 +47,64 @@ export default function Home() {
       }
     }
 
-    fetchMovies();
+    const fetchShowings = async () => {
+      try {
+        const response = await fetch(`${SHOWINGS_URL}?limit=10`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+  
+        if (response.status === 401) {
+          auth.loginRequired();
+  
+          return null;
+        }
+  
+        if (!response.ok) {
+          throw new Error("Failed to fetch movies.");
+        }
+  
+        const data = await response.json();
+  
+        setShowings(data);
+      } catch {
+        showToast("Nie udało się pobrać seansów.", true);
+  
+        return null;
+      }
+    }
+
+    const fetchReservations = async () => {
+      try {
+        const response = await fetch(`${RESERVATIONS_URL}/user?limit=10`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+  
+        if (response.status === 401) return null;
+        
+        if (!response.ok) {
+          throw new Error("Failed to fetch movies.");
+        }
+  
+        const data = await response.json();
+  
+        setReservations(data);
+      } catch {
+        showToast("Nie udało się pobrać seansów.", true);
+  
+        return null;
+      }
+    }
+
+    fetchReservations();
+    fetchShowings();
+    fetchLatestMovies();
   }, []);
 
   return (
     <div>
-      <div className="relative h-[45svh] p-[4rem] w-full rounded-b-2xl overflow-hidden flex items-end justify-center">
+      <div className="relative sm:h-[45svh] h-[25svh] sm:p-[4rem] p-[2rem] w-full rounded-b-2xl overflow-hidden flex items-end justify-center">
         <Image
           fill
           alt=""
@@ -72,14 +123,12 @@ export default function Home() {
           </div>
       </div>
 
-      <FilterCarousel activeFilter={activeFilter} onFilterChange={setActiveFilter} />
-
-      <section className='py-8 px-8 max-w-[1640px] m-auto flex flex-row flex-wrap justify-center gap-8'>
-        {Array.from({ length: 5 }).map((_, index) => (
-          movies.map((movie) => (
-            <MovieCard key={`${movie.id}-${index}`} movie={movie} />
-          ))
-        ))}
+      <section className="max-w-[1640px] mx-auto">
+        {auth.isAuthenticated &&
+          <Carousel reservations={reservations} resource="reservations" title="Nadchodzące rezerwacje" />
+        }
+        <Carousel resource="showings" showings={showings} title="Nadchodzące seanse" />
+        <Carousel movies={movies} resource="movies" title="Najnowsze filmy" />
       </section>
     </div>
   );

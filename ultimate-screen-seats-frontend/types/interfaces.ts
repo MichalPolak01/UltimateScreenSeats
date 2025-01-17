@@ -34,3 +34,27 @@ interface ShowingList {
     date_to: string
     movie: MoviePreview
 }
+
+interface CinemaRoom {
+    id: number
+    name: string
+    seat_layout: number[]
+    number_of_seats: number
+}
+
+interface Showing {
+    id: number
+    movie: Movie
+    cinema_room: CinemaRoom
+    date: string
+    ticket_price: number
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface Reservation {
+    id: number
+    showing:  Showing
+    seat_row: number
+    seat_column: number
+    reserve_at: string
+}

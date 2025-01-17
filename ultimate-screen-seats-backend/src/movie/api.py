@@ -1,4 +1,5 @@
 import traceback
+from typing import Optional
 from ninja_extra import Router
 
 from core.schemas import MessageSchema
@@ -39,17 +40,20 @@ def create_movie(request, payload: MovieCreateSchema):
  
 
 @router.get('', response={200: list[MovieSchema], 404: MessageSchema, 500: MessageSchema})
-def get_movies(request):
-    """Fetch list of movies"""
+def get_movies(request, limit: Optional[int] = None):
+    """Fetch list of movies with an optional limit"""
 
     try:
         movies = Movie.objects.all().order_by('-release_date')
+
+        if limit is not None:
+            movies = movies[:limit]
 
         return 200, movies
     except Movie.DoesNotExist:
         return 404, {"message": "Movies not found."}
     except Exception as e:
-        return 500, {"message": "An unexpected error ocurred during fetching movies."}
+        return 500, {"message": "An unexpected error occurred during fetching movies."}
     
 
 @router.get('/genre', response={200: list[GenreSchema], 404: MessageSchema, 500: MessageSchema})

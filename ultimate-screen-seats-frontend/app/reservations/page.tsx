@@ -60,7 +60,7 @@ export default function Reservations() {
     
     if (error) {
         return (
-            <div className="flex justify-center items-center h-screen">
+            <div className="flex justify-center items-center h-screen max-w-7xl mx-auto">
                 <Card className="w-full max-w-lg p-8 bg-red-500 text-white rounded-lg shadow-lg">
                     <CardHeader className="p-2 flex-col items-start">
                         <h1 className="text-2xl font-semibold mb-2">Wystąpił błąd</h1>
@@ -81,7 +81,7 @@ export default function Reservations() {
     }
 
     return (
-        <div className="flex flex-col justify-center mt-10">
+        <div className="flex flex-col justify-center mt-10 max-w-7xl mx-auto">
             <Card className="w-full p-8">
                 <CardHeader className="p-2 flex-col items-start border-b-2 border-default-200 mb-4">
                     <h1 className="text-primary text-4xl font-semibold mb-2">Moje Rezerwacje</h1>

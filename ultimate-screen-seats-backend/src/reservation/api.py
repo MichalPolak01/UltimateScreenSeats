@@ -1,3 +1,4 @@
+from typing import Optional
 from ninja_extra import Router
 
 from core.schemas import MessageSchema
@@ -58,13 +59,15 @@ def get_reservations(request, user_id: int = None):
         return 400, {"message": f"An unexpected error occurred: {e}"}
     
 
-@router.get('/{option}/{id}', response={200: list[ReservationSchema], 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
-def get_reservations_with_option(request, option: str, id: int):
+@router.get('/{option}', response={200: list[ReservationSchema], 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
+def get_reservations_with_option(request, option: str, id: Optional[int] = None, limit: Optional[int] = None):
     """Fetch reservations by single `user` or `movie`"""
 
     try:
+        user = request.user
+
         if option == "user":
-            reservations = Reservation.objects.filter(user_id=id)
+            reservations = Reservation.objects.filter(user=user)
         elif option == "movie":
             reservations = Reservation.objects.filter(showing__movie_id=id)
         else:
@@ -72,6 +75,9 @@ def get_reservations_with_option(request, option: str, id: int):
 
         if not reservations.exists():
             return 404, {"message": f"No reservations found for {option} with id {id}."}
+        
+        if limit is not None:
+            reservations = reservations[:limit]
 
         return 200, list(reservations)
 

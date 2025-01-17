@@ -12,6 +12,7 @@ import { Link } from "@nextui-org/link";
 import { link as linkStyles } from "@nextui-org/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
+import { usePathname } from "next/navigation";
 
 import NavbarAccount from "./NavAccountDropdown";
 
@@ -22,8 +23,10 @@ import {
 } from "@/components/icons";
 import { useAuth } from "@/providers/authProvider";
 
+
 export const Navbar = () => {
   const auth = useAuth();
+  const pathname = usePathname();
 
   return (
     <NextUINavbar maxWidth="xl" position="sticky">
@@ -42,9 +45,11 @@ export const Navbar = () => {
                 <NextLink
                   className={clsx(
                     linkStyles({ color: "foreground" }),
-                    "data-[active=true]:text-primary data-[active=true]:font-medium",
+                    {
+                      "text-primary font-medium": pathname.startsWith(item.href),
+                      "text-default-500": !pathname.startsWith(item.href),
+                    }
                   )}
-                  color="foreground"
                   href={item.href}
                 >
                   {item.label}
@@ -56,7 +61,7 @@ export const Navbar = () => {
        
       </NavbarContent>
 
-    <NavbarItem>
+    {/* <NavbarItem>
       <NextLink
         className={clsx(
           linkStyles({ color: "foreground" }),
@@ -67,7 +72,7 @@ export const Navbar = () => {
       >
         Przejdź do Seansu
       </NextLink>
-    </NavbarItem>
+    </NavbarItem> */}
 
 
       <NavbarContent className="hidden sm:flex basis-1/5 sm:basis-full" justify="end">

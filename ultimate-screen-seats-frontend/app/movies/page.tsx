@@ -50,7 +50,7 @@ export default function Home() {
 
   return (
     <div>
-      <div className="relative h-[35svh] p-[4rem] w-full rounded-b-2xl overflow-hidden flex items-end justify-center">
+      <div className="relative h-[40svh] p-[4rem] w-full rounded-b-2xl overflow-hidden flex items-end justify-center">
         <Image
           fill
           priority

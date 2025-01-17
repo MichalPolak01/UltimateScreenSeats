@@ -8,9 +8,9 @@ import { DateValue } from "@internationalized/date";
 import Image from "next/image";
 
 import { showToast } from "@/lib/showToast";
-import ShowingCard from "@/components/showing-card/showingCard";
+import ShowingListCard from "@/components/showing-card/showingListCard";
 
-const SHOWINGS_URL = "/api/showings";
+const SHOWINGS_URL = "/api/showings/list";
 
 
 export default function Showings() {
@@ -73,7 +73,7 @@ export default function Showings() {
 
     return (
         <div>
-            <div className="relative h-[35svh] p-[4rem] w-full rounded-b-2xl overflow-hidden flex items-end justify-center">
+            <div className="relative h-[40svh] p-[4rem] w-full rounded-b-2xl overflow-hidden flex items-end justify-center">
                 <Image
                     fill
                     priority
@@ -92,7 +92,7 @@ export default function Showings() {
                 </div>
             </div>
 
-            <div className="py-5 px-8 max-w-[1640px] m-auto flex flex-wrap items-center justify-center gap-8">
+            <div className="py-5 px-8 max-w-[1640px] mx-auto mt-4 flex flex-wrap items-center justify-center gap-8">
                 <DateRangePicker
                     className="w-full max-w-sm"
                     label="Zakres dat"
@@ -108,7 +108,7 @@ export default function Showings() {
             <section className="py-8 px-8 max-w-[1640px] m-auto flex flex-row flex-wrap justify-center gap-8">
                 {Array.from({ length: 5 }).map((_, index) => (
                     showings.map((showing) => (
-                        <ShowingCard key={`${showing.id}-${index}`} showing={showing} />
+                        <ShowingListCard key={`${showing.id}-${index}`} showing={showing} />
                     ))
                 ))}
             </section>
