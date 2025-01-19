@@ -14,6 +14,11 @@ export const siteConfig = {
       href: "/movies",
       authRequired: false
     },
+    {
+      label: "Dashboard",
+      href: "/dashboard",
+      authRequired: true
+    }
   ],
   navMenuItems: [
     {

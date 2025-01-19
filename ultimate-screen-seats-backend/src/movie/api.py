@@ -95,7 +95,7 @@ def update_movie(request, payload: MovieUpdateSchema, movie_id: int):
             genres = Genre.objects.filter(id__in=payload.genre_id)
             if not genres.exists():
                 return 400, {"message": "Invalid genre IDs provided."}
-            movie.genres.set(genres)
+            movie.genre.set(genres)
 
         for attr, value in payload.dict(exclude_unset=True).items():
             if attr != "genre_ids":
@@ -106,11 +106,12 @@ def update_movie(request, payload: MovieUpdateSchema, movie_id: int):
     except Movie.DoesNotExist:
         return 404, {"message": f"Movie with id {movie_id} not found."}
     except Exception as e:
+        traceback.print_exc()
         return 500, {"message": "An unexpected error occurred during movie update."}
 
 
 @router.delete('{movie_id}', response={200: MessageSchema, 404: MessageSchema, 500: MessageSchema}, auth=helpers.auth_required)
-def delete_movie(response, movie_id: int):
+def delete_movie(request, movie_id: int):
     "Remove a movie by `movie_id`"
     
     try:

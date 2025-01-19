@@ -43,48 +43,48 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
-    // useEffect(() => {
-    //     const checkToken = async () => {
-    //         const token = localStorage.getItem(LOCAL_TOKEN_KEY);
+    useEffect(() => {
+        const checkToken = async () => {
+            const token = localStorage.getItem(LOCAL_TOKEN_KEY);
 
-    //         if (token) {
-    //             if (isTokenExpired(token)) {
-    //                 loginRequired();
+            if (token) {
+                if (isTokenExpired(token)) {
+                    loginRequired();
 
-    //                 return;
-    //             }
+                    return;
+                }
 
-    //             setIsAuthenticated(true);
-    //             setAuthToken(token);
+                setIsAuthenticated(true);
+                setAuthToken(token);
 
-    //             const decodedToken = decodeToken(token);
-    //             const userIdFromToken = decodedToken?.user_id;
+                const decodedToken = decodeToken(token);
+                const userIdFromToken = decodedToken?.user_id;
                 
-    //             if (userIdFromToken) {
-    //                 setUserId(userIdFromToken);
-    //                 localStorage.setItem(LOCAL_USER_ID_KEY, String(userIdFromToken));
-    //             }
-    //         } else {
-    //             loginRequired();
+                if (userIdFromToken) {
+                    setUserId(userIdFromToken);
+                    localStorage.setItem(LOCAL_USER_ID_KEY, String(userIdFromToken));
+                }
+            } else {
+                // loginRequired();
 
-    //             return;
-    //         }
+                return;
+            }
 
-    //         const storedUsername = localStorage.getItem(LOCAL_USERNAME_KEY);
+            const storedUsername = localStorage.getItem(LOCAL_USERNAME_KEY);
 
-    //         if (storedUsername) {
-    //             setUsername(storedUsername);
-    //         }
+            if (storedUsername) {
+                setUsername(storedUsername);
+            }
 
-    //         const storedRole = localStorage.getItem(LOCAL_ROLE_KEY);
+            const storedRole = localStorage.getItem(LOCAL_ROLE_KEY);
 
-    //         if (storedRole) {
-    //             setRole(storedRole);
-    //         }
-    //     }
+            if (storedRole) {
+                setRole(storedRole);
+            }
+        }
 
-    //     checkToken();
-    // }, []);
+        checkToken();
+    }, []);
 
     const login = async (username?: string, role?: string, authToken?: string, refreshToken?: string) => {
         if (authToken) {

@@ -107,7 +107,8 @@ export default function Home() {
       <div className="relative sm:h-[45svh] h-[25svh] sm:p-[4rem] p-[2rem] w-full rounded-b-2xl overflow-hidden flex items-end justify-center">
         <Image
           fill
-          alt=""
+          priority
+          alt="Slider image"
           className="absolute inset-0 object-cover w-full h-full"
           src="/images/cinema.jpg"
         />

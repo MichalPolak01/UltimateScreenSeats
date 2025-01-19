@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 const protectedRoutes = {
     "/account-settings": ['USER', 'TEACHER'],
     "/change-password": ['USER', 'TEACHER'],
+    "/reservations": ['USER', 'TEACHER'],
 };
 
 // const publicRoutes = ['/register'];

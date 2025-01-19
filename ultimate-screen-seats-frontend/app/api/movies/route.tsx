@@ -19,3 +19,12 @@ export async function GET(request: Request) {
 
     return NextResponse.json(data, { status });
 }
+
+
+export async function POST( request: Request) {
+    const requestData = await request.json();
+
+    const { data, status } = await ApiProxy.post(`${DJANGO_API_MOVIES_URL}`, requestData, true);
+
+    return NextResponse.json(data, { status: status });
+}
