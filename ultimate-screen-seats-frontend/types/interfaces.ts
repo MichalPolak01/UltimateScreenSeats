@@ -38,7 +38,7 @@ interface ShowingList {
 interface CinemaRoom {
     id: number
     name: string
-    seat_layout: number[]
+    seat_layout: number[][]
     number_of_seats: number
 }
 

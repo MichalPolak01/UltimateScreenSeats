@@ -11,20 +11,29 @@ import DetailsModal from "@/components/dashboard/movies/movieDetail";
 import EditModal from "@/components/dashboard/movies/movieEdit";
 import MoviesTable from "@/components/dashboard/movies/moviesTable";
 import { showToast } from "@/lib/showToast";
+import HallTable from "@/components/dashboard/cinema-rooms/cinemaRoomsTable";
+import EditHallModal from "@/components/dashboard/cinema-rooms/hallEdit";
+import ConfirmHallDeleteModal from "@/components/dashboard/cinema-rooms/hallDelete";
 
 
 const MOVIES_URL = "api/movies";
+const HALLS_URL = "api/halls";
 const GENRES_URL = 'api/movies/genres'
 
 export default function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [genres, setGenres] = useState<Genre[]>([]);
+  const [halls, setHalls] = useState<CinemaRoom[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   const [selectedMovie, setSelectedResource] = useState<Movie | undefined>(undefined);
   const [isDetailsModalOpen, setDetailsModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  const [selectedHall, setSelectedHall] = useState<CinemaRoom | undefined>(undefined);
+  const [isEditHallModalOpen, setEditHallModalOpen] = useState(false);
+  const [isDeleteHallModalOpen, setDeleteHallModalOpen] = useState(false);
 
   const fetchMovies = async () => {
     try {
@@ -63,11 +72,30 @@ export default function App() {
 
       const data = await response.json();
 
-      const allGenres = [{ id: 0, name: "Wszystkie" }, ...data];
-
-      setGenres(allGenres);
+      setGenres(data);
     } catch {
       showToast("Nie udało się pobrać gatunków filmów.", true);
+
+      return null;
+    }
+  }
+
+  const fetchHalls = async () => {
+    try {
+      const response = await fetch(HALLS_URL, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch movie halls.");
+      }
+
+      const data = await response.json();
+
+      setHalls(data);
+    } catch {
+      showToast("Nie udało się pobrać sal kinowych.", true);
 
       return null;
     }
@@ -76,6 +104,7 @@ export default function App() {
   useEffect(() => {
     fetchGenres();
     fetchMovies();
+    fetchHalls();
   }, []);
 
 
@@ -92,6 +121,16 @@ export default function App() {
   const handleDelete = (movie: Movie) => {
     setSelectedResource(movie);
     setDeleteModalOpen(true);
+  };
+
+  const handleUpdateCinemaRoom = (cinemaRoom?: CinemaRoom) => {
+    setSelectedHall(cinemaRoom);
+    setEditHallModalOpen(true);
+  };
+
+  const handleDeleteCinemaRoom = (cinemaRoom: CinemaRoom) => {
+    setSelectedHall(cinemaRoom);
+    setDeleteHallModalOpen(true);
   };
 
   return (
@@ -136,16 +175,28 @@ export default function App() {
         </Tab>
         <Tab
           key="cinema-rooms"
+          className="w-full"
           title={
             <div className="flex items-center space-x-2">
               <Music2 />
               <span>Sale kinowe</span>
               <Chip size="sm" variant="faded">
-                3
+                {halls.length}
               </Chip>
             </div>
           }
-        />
+        >
+          <Card className="h-[80svh]">
+            <CardBody>
+              <HallTable
+                halls={halls}
+                loading={loading}
+                onDelete={handleDeleteCinemaRoom}
+                onUpdate={handleUpdateCinemaRoom}
+              />
+            </CardBody>
+          </Card>
+        </Tab>
         <Tab
           key="showings"
           title={
@@ -195,6 +246,40 @@ export default function App() {
           }}
         />
       )}
+
+      {/* Cinema rooms */}
+      {isEditHallModalOpen && (
+        <EditHallModal
+          hall={selectedHall}
+          isOpen={isEditHallModalOpen}
+          onClose={() => setEditHallModalOpen(false)}
+          onSave={(updatedHall) => {
+            if (halls.some((m) => m.id === updatedHall.id)) {
+              setHalls((prev) =>
+                prev.map((m) => (m.id === updatedHall.id ? updatedHall : m))
+              );
+              fetchHalls();
+            } else {
+              setHalls((prev) => [...prev, updatedHall]);
+              fetchHalls();
+            }
+          }}
+        />
+      )}
+
+      {isDeleteHallModalOpen && selectedHall && (
+        <ConfirmHallDeleteModal
+          hall={selectedHall}
+          isOpen={isDeleteHallModalOpen}
+          onClose={() => setDeleteHallModalOpen(false)}
+          onConfirm={() => {
+            setHalls((prev) => prev.filter((m) => m.id !== selectedHall.id));
+            setDeleteHallModalOpen(false);
+          }}
+        />
+      )}
+
+
     </div>
   );
 }
