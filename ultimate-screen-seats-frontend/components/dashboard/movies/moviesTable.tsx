@@ -139,7 +139,7 @@ export default function MoviesTable({ movies, onShowDetail, onUpdate, onDelete, 
           value={filterValue}
           onChange={(e) => setFilterValue(e.target.value)}
         />
-        <Button size="sm" onClick={() => onUpdate()}>
+        <Button size="md" onClick={() => onUpdate()}>
           Dodaj nowy film
         </Button>
       </div>

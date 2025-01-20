@@ -4,7 +4,7 @@ import React, { useState, useMemo } from "react";
 import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/table";
 import { Button } from "@nextui-org/button";
 import { Tooltip } from "@nextui-org/tooltip";
-import { Edit3, Trash2, ArrowDownAz, ArrowDownZa } from "lucide-react";
+import { Edit3, Trash2, ArrowDownAz, ArrowDownZa, ArrowDown01, ArrowDown10 } from "lucide-react";
 import { Pagination } from "@heroui/pagination";
 import { Spinner } from "@nextui-org/spinner";
 import { Input } from "@nextui-org/input";
@@ -138,7 +138,7 @@ export default function HallTable({ halls, loading, onUpdate, onDelete }: HallTa
           value={filterValue}
           onChange={(e) => setFilterValue(e.target.value)}
         />
-        <Button size="sm" onClick={() => onUpdate()}>
+        <Button size="md" onClick={() => onUpdate()}>
           Dodaj nową salę kinową
         </Button>
       </div>
@@ -163,7 +163,7 @@ export default function HallTable({ halls, loading, onUpdate, onDelete }: HallTa
         <TableHeader>
           <TableColumn key="id" onClick={() => handleSort("id")}>
             <div className="flex items-center gap-1 cursor-pointer">
-              ID {sortKey === "id" && (sortOrder === "asc" ? <ArrowDownAz /> : <ArrowDownZa />)}
+              ID {sortKey === "id" && (sortOrder === "asc" ? <ArrowDown01 /> : <ArrowDown10 />)}
             </div>
           </TableColumn>
           <TableColumn key="name" onClick={() => handleSort("name")}>

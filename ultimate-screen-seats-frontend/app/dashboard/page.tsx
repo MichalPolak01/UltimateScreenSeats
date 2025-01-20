@@ -14,16 +14,22 @@ import { showToast } from "@/lib/showToast";
 import HallTable from "@/components/dashboard/cinema-rooms/cinemaRoomsTable";
 import EditHallModal from "@/components/dashboard/cinema-rooms/hallEdit";
 import ConfirmHallDeleteModal from "@/components/dashboard/cinema-rooms/hallDelete";
+import ShowingsTable from "@/components/showings/showingsTable";
+import ReservationsTable from "@/components/reservations/reservationsTable";
 
 
 const MOVIES_URL = "api/movies";
 const HALLS_URL = "api/halls";
+const SHOWINGS_URL = "api/showings";
+const RESERVATIONS_URL = "api/reservations";
 const GENRES_URL = 'api/movies/genres'
 
 export default function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [genres, setGenres] = useState<Genre[]>([]);
   const [halls, setHalls] = useState<CinemaRoom[]>([]);
+  const [showings, setShowings] = useState<Showing[]>([]);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   const [selectedMovie, setSelectedResource] = useState<Movie | undefined>(undefined);
@@ -34,6 +40,10 @@ export default function App() {
   const [selectedHall, setSelectedHall] = useState<CinemaRoom | undefined>(undefined);
   const [isEditHallModalOpen, setEditHallModalOpen] = useState(false);
   const [isDeleteHallModalOpen, setDeleteHallModalOpen] = useState(false);
+
+  const [selectedShowing, setSelectedShowing] = useState<Showing | undefined>(undefined);
+  const [isEditShowingModalOpen, setEditShowingModalOpen] = useState(false);
+  const [isDeleteShowingModalOpen, setDeleteShowingModalOpen] = useState(false);
 
   const fetchMovies = async () => {
     try {
@@ -101,10 +111,54 @@ export default function App() {
     }
   }
 
+  const fetchShowings = async () => {
+    try {
+      const response = await fetch(SHOWINGS_URL, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch movie halls.");
+      }
+
+      const data = await response.json();
+
+      setShowings(data);
+    } catch {
+      showToast("Nie udało się pobrać seansów.", true);
+
+      return null;
+    }
+  }
+
+  const fetchReservations = async () => {
+    try {
+      const response = await fetch(RESERVATIONS_URL, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch movie halls.");
+      }
+
+      const data = await response.json();
+
+      setReservations(data);
+    } catch {
+      showToast("Nie udało się pobrać seansów.", true);
+
+      return null;
+    }
+  }
+
   useEffect(() => {
     fetchGenres();
     fetchMovies();
     fetchHalls();
+    fetchShowings();
+    fetchReservations();
   }, []);
 
 
@@ -131,6 +185,22 @@ export default function App() {
   const handleDeleteCinemaRoom = (cinemaRoom: CinemaRoom) => {
     setSelectedHall(cinemaRoom);
     setDeleteHallModalOpen(true);
+  };
+
+  // Showings
+  const handleShowShowingsDetail = (showing: Showing) => {
+    // setSelectedResource(movie);
+    // setDetailsModalOpen(true);
+  };
+
+  const handleUpdateShowingsDetail = (showing?: Showing) => {
+    // setSelectedResource(movie || undefined);
+    // setEditModalOpen(true);
+  };
+
+  const handleDeleteShowingsDetail = (showing: Showing) => {
+    // setSelectedResource(movie);
+    // setDeleteModalOpen(true);
   };
 
   return (
@@ -199,6 +269,7 @@ export default function App() {
         </Tab>
         <Tab
           key="showings"
+          className="w-full"
           title={
             <div className="flex items-center space-x-2">
               <Video />
@@ -208,7 +279,44 @@ export default function App() {
               </Chip>
             </div>
           }
-        />
+        >
+          <Card className="h-[80svh]">
+            <CardBody>
+              <ShowingsTable
+                showings={showings}
+                reservations={reservations}
+                loading={loading}
+                onDelete={handleDeleteShowingsDetail}
+                onUpdate={handleUpdateShowingsDetail}
+              />
+            </CardBody>
+          </Card>
+        </Tab>
+
+        <Tab
+          key="reservations"
+          className="w-full"
+          title={
+            <div className="flex items-center space-x-2">
+              <Video />
+              <span>Rezerwacje</span>
+              <Chip size="sm" variant="faded">
+                1
+              </Chip>
+            </div>
+          }
+        >
+          <Card className="h-[80svh]">
+            <CardBody>
+              <ReservationsTable
+                reservations={reservations}
+                loading={loading}
+                // onDelete={console.log('asdads')}
+                // onUpdate={handleUpdateShowingsDetail}
+              />
+            </CardBody>
+          </Card>
+        </Tab>
       </Tabs>
 
       {isDetailsModalOpen && selectedMovie && (
