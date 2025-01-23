@@ -14,8 +14,11 @@ import { showToast } from "@/lib/showToast";
 import HallTable from "@/components/dashboard/cinema-rooms/cinemaRoomsTable";
 import EditHallModal from "@/components/dashboard/cinema-rooms/hallEdit";
 import ConfirmHallDeleteModal from "@/components/dashboard/cinema-rooms/hallDelete";
-import ShowingsTable from "@/components/showings/showingsTable";
-import ReservationsTable from "@/components/reservations/reservationsTable";
+import ShowingsTable from "@/components/dashboard/showings/showingsTable";
+import ReservationsTable from "@/components/dashboard/reservations/reservationsTable";
+import { useAuth } from "@/providers/authProvider";
+import AddShowingModal from "@/components/dashboard/showings/showingAdd";
+import ConfirmDeleteShowingModal from "@/components/dashboard/showings/showingsDelete";
 
 
 const MOVIES_URL = "api/movies";
@@ -42,8 +45,10 @@ export default function App() {
   const [isDeleteHallModalOpen, setDeleteHallModalOpen] = useState(false);
 
   const [selectedShowing, setSelectedShowing] = useState<Showing | undefined>(undefined);
-  const [isEditShowingModalOpen, setEditShowingModalOpen] = useState(false);
+  const [isCreateShowingModalOpen, setCreateShowingModalOpen] = useState(false);
   const [isDeleteShowingModalOpen, setDeleteShowingModalOpen] = useState(false);
+
+  const auth = useAuth();
 
   const fetchMovies = async () => {
     try {
@@ -118,6 +123,12 @@ export default function App() {
         headers: { "Content-Type": "application/json" },
       });
 
+      if (response.status === 401) {
+        auth.loginRequired();
+
+        return;
+      }
+
       if (!response.ok) {
         throw new Error("Failed to fetch movie halls.");
       }
@@ -138,6 +149,12 @@ export default function App() {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
+
+      if (response.status === 401) {
+        auth.loginRequired();
+
+        return;
+      }
 
       if (!response.ok) {
         throw new Error("Failed to fetch movie halls.");
@@ -187,20 +204,13 @@ export default function App() {
     setDeleteHallModalOpen(true);
   };
 
-  // Showings
-  const handleShowShowingsDetail = (showing: Showing) => {
-    // setSelectedResource(movie);
-    // setDetailsModalOpen(true);
-  };
-
-  const handleUpdateShowingsDetail = (showing?: Showing) => {
-    // setSelectedResource(movie || undefined);
-    // setEditModalOpen(true);
+  const handleAddShowingsDetail = () => {
+    setCreateShowingModalOpen(true);
   };
 
   const handleDeleteShowingsDetail = (showing: Showing) => {
-    // setSelectedResource(movie);
-    // setDeleteModalOpen(true);
+    setDeleteShowingModalOpen(true);
+    setSelectedShowing(showing);
   };
 
   return (
@@ -208,9 +218,9 @@ export default function App() {
       <Tabs
         aria-label="Options"
         classNames={{
-          tabList: "gap-6 w-full h-full relative rounded-none pr-8 mr-4 border-r border-divider",
+          tabList: "gap-6 w-full h-full justify-start relative rounded-none pr-8 mr-4 border-r border-divider",
           cursor: "w-full bg-[#22d3ee]",
-          tab: "max-w-fit px-0 h-12",
+          tab: "max-w-fit px-0 h-12 justify-start",
           tabContent: "group-data-[selected=true]:text-[#06b6d4]",
         }}
         color="primary"
@@ -224,7 +234,7 @@ export default function App() {
             <div className="flex items-center space-x-2">
               <GalleryVertical />
               <span>Filmy</span>
-              <Chip size="sm" variant="faded">
+              <Chip className="group-data-[selected=true]:bg-[#fff] group-data-[selected=true]:border-[#06b6d4] group-data-[selected=true]:text-[#06b6d4]" size="sm" variant="faded">
                 {movies.length}
               </Chip>
             </div>
@@ -250,7 +260,7 @@ export default function App() {
             <div className="flex items-center space-x-2">
               <Music2 />
               <span>Sale kinowe</span>
-              <Chip size="sm" variant="faded">
+              <Chip className="group-data-[selected=true]:bg-[#fff] group-data-[selected=true]:border-[#06b6d4] group-data-[selected=true]:text-[#06b6d4]" size="sm" variant="faded">
                 {halls.length}
               </Chip>
             </div>
@@ -274,8 +284,8 @@ export default function App() {
             <div className="flex items-center space-x-2">
               <Video />
               <span>Seanse</span>
-              <Chip size="sm" variant="faded">
-                1
+              <Chip className="group-data-[selected=true]:bg-[#fff] group-data-[selected=true]:border-[#06b6d4] group-data-[selected=true]:text-[#06b6d4]" size="sm" variant="faded">
+                {showings.length}
               </Chip>
             </div>
           }
@@ -283,11 +293,11 @@ export default function App() {
           <Card className="h-[80svh]">
             <CardBody>
               <ShowingsTable
-                showings={showings}
-                reservations={reservations}
                 loading={loading}
+                reservations={reservations}
+                showings={showings}
+                onCreate={handleAddShowingsDetail}
                 onDelete={handleDeleteShowingsDetail}
-                onUpdate={handleUpdateShowingsDetail}
               />
             </CardBody>
           </Card>
@@ -300,8 +310,8 @@ export default function App() {
             <div className="flex items-center space-x-2">
               <Video />
               <span>Rezerwacje</span>
-              <Chip size="sm" variant="faded">
-                1
+              <Chip className="group-data-[selected=true]:bg-[#fff] group-data-[selected=true]:border-[#06b6d4] group-data-[selected=true]:text-[#06b6d4]" size="sm" variant="faded">
+                {reservations.length}
               </Chip>
             </div>
           }
@@ -309,10 +319,8 @@ export default function App() {
           <Card className="h-[80svh]">
             <CardBody>
               <ReservationsTable
-                reservations={reservations}
                 loading={loading}
-                // onDelete={console.log('asdads')}
-                // onUpdate={handleUpdateShowingsDetail}
+                reservations={reservations}
               />
             </CardBody>
           </Card>
@@ -355,7 +363,6 @@ export default function App() {
         />
       )}
 
-      {/* Cinema rooms */}
       {isEditHallModalOpen && (
         <EditHallModal
           hall={selectedHall}
@@ -387,7 +394,31 @@ export default function App() {
         />
       )}
 
+      {isCreateShowingModalOpen && (
+        <AddShowingModal
+          cinemaRooms={halls}
+          isOpen={isCreateShowingModalOpen}
+          
+          movies={movies}
+          onClose={() => setCreateShowingModalOpen(false)}
+          onSave={() => {
+            fetchShowings();
+          }}
+        />
+      )}
 
+      {isDeleteShowingModalOpen && selectedShowing && (
+        <ConfirmDeleteShowingModal
+          isOpen={isDeleteShowingModalOpen}
+          reservations={reservations}
+          showing={selectedShowing}
+          onClose={() => setDeleteShowingModalOpen(false)}
+          onConfirm={() => {
+            setShowings((prev) => prev.filter((m) => m.id !== selectedShowing.id));
+            setDeleteShowingModalOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }

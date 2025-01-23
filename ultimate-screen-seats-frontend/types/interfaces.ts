@@ -53,8 +53,16 @@ interface Showing {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface Reservation {
     id: number
+    user: User
     showing:  Showing
     seat_row: number
     seat_column: number
     reserve_at: string
+}
+
+interface User {
+    id: number
+    username: string
+    email: string
+    role: string
 }

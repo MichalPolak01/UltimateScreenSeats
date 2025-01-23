@@ -134,7 +134,7 @@ export default function HallTable({ halls, loading, onUpdate, onDelete }: HallTa
       <div className="flex justify-between items-center mb-4">
         <Input
           className="w-1/3"
-          placeholder="Search by hall name..."
+          placeholder="Szukaj po nazwie sali..."
           value={filterValue}
           onChange={(e) => setFilterValue(e.target.value)}
         />

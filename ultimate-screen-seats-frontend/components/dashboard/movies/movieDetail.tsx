@@ -15,6 +15,7 @@ interface DetailsModalProps {
 export default function DetailsModal({ isOpen, onClose, movie }: DetailsModalProps) {
   return (
     <Modal
+      className="py-2"
       isOpen={isOpen}
       scrollBehavior='inside'
       size="xl"

@@ -156,6 +156,7 @@ export default function EditModal({ isOpen, onClose, movie, onSave, genres = [] 
 
   return (
     <Modal
+      className="py-2"
       isDismissable={false}
       isOpen={isOpen}
       scrollBehavior={scrollBehavior}
@@ -213,7 +214,6 @@ export default function EditModal({ isOpen, onClose, movie, onSave, genres = [] 
                 }
               />
               <Select
-                className="max-w-xs"
                 errorMessage={errors.genre ? "Wybierz co najmniej jednen gatunek." : undefined}
                 isInvalid={errors.genre}
                 label="Gatunek/i"
@@ -284,11 +284,11 @@ export default function EditModal({ isOpen, onClose, movie, onSave, genres = [] 
                 />
               </div>
             </ModalBody>
-            <ModalFooter>
-              <Button color="danger" variant="light" onPress={onClose}>
+            <ModalFooter className="mt-2">
+              <Button color="danger" variant="ghost" onPress={onClose}>
                 Anuluj
               </Button>
-              <Button color="primary" onPress={handleSubmit}>
+              <Button color="primary" variant="ghost" onPress={handleSubmit}>
                 Zapisz
               </Button>
             </ModalFooter>

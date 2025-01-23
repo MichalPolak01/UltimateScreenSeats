@@ -135,7 +135,7 @@ export default function MoviesTable({ movies, onShowDetail, onUpdate, onDelete, 
       <div className="flex justify-between items-center mb-4">
         <Input
           className="w-1/3"
-          placeholder="Search by title..."
+          placeholder="Wyszukaj film po tytule..."
           value={filterValue}
           onChange={(e) => setFilterValue(e.target.value)}
         />

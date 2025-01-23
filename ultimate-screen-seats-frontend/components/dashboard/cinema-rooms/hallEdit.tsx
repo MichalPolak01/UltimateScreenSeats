@@ -160,6 +160,7 @@ export default function EditHallModal({
 
   return (
     <Modal
+      className="py-2"
       isDismissable={false}
       isOpen={isOpen}
       scrollBehavior={scrollBehavior}
@@ -215,18 +216,24 @@ export default function EditHallModal({
                     </div>
                   ))}
                 </div>
-                <div className=" py-4 flex items-center">
-                    <div className="flex items-center justify-center rounded cursor-pointer bg-primary-500 text-white hover:bg-primary-700 h-8 w-8">S</div>
-                    <p>&nbsp;- Miejsce siedzące</p>
+                <div className="py-4">
+                  <div className="flex items-center mb-2">
+                      <div className="flex items-center justify-center rounded cursor-pointer bg-primary-500 text-white hover:bg-primary-700 h-8 w-8">S</div>
+                      <p>&nbsp;- Miejsce siedzące</p>
+                  </div>
+                  <div className="flex items-center">
+                      <div className="flex items-center justify-center rounded cursor-pointer bg-gray-400 h-8 w-8"/>
+                      <p>&nbsp;- Brak miejsca siedzącego</p>
+                  </div>
                 </div>
                 <div className="flex justify-between mt-4">
-                  <Button color="success" size="sm" onPress={handleAddRow}>
+                  <Button color="success" size="sm" variant="flat" onPress={handleAddRow}>
                     Dodaj wiersz
                   </Button>
                   <Button color="danger" size="sm" variant="flat" onPress={handleRemoveRow}>
                     Usuń wiersz
                   </Button>
-                  <Button color="success" size="sm" onPress={handleAddColumn}>
+                  <Button color="success" size="sm" variant="flat" onPress={handleAddColumn}>
                     Dodaj kolumnę
                   </Button>
                   <Button color="danger" size="sm" variant="flat" onPress={handleRemoveColumn}>
@@ -239,10 +246,10 @@ export default function EditHallModal({
               </p>
             </ModalBody>
             <ModalFooter>
-              <Button color="danger" variant="light" onPress={onClose}>
+              <Button color="danger" variant="ghost" onPress={onClose}>
                 Anuluj
               </Button>
-              <Button color="primary" onPress={handleSubmit}>
+              <Button color="primary" variant="ghost" onPress={handleSubmit}>
                 Zapisz
               </Button>
             </ModalFooter>

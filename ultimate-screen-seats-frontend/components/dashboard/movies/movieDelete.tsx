@@ -47,7 +47,7 @@ export default function ConfirmDeleteModal({ isOpen, onClose, onConfirm, movie }
   };
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
+    <Modal className="py-1" isOpen={isOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <ModalContent>
         {() => (
           <>
@@ -56,10 +56,10 @@ export default function ConfirmDeleteModal({ isOpen, onClose, onConfirm, movie }
               <p>Czy na pewno chcesz usunąć film &quot;{movie.title}&quot;?</p>
             </ModalBody>
             <ModalFooter>
-              <Button color="primary" variant="light" onPress={onClose}>
+              <Button color="primary" variant="ghost" onPress={onClose}>
                 Anuluj
               </Button>
-              <Button color="danger" onPress={() => handleDelete()}>
+              <Button color="danger" variant="ghost" onPress={() => handleDelete()}>
                 Usuń
               </Button>
             </ModalFooter>

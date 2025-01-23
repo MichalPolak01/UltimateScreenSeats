@@ -7,29 +7,6 @@ import { Pagination } from "@heroui/pagination";
 import { Tooltip } from "@nextui-org/tooltip";
 import { Spinner } from "@nextui-org/spinner";
 
-// interface Reservation {
-//   id: number;
-//   user: {
-//     id: number;
-//     username: string;
-//     email: string;
-//   };
-//   showing: {
-//     id: number;
-//     movie: {
-//       id: number;
-//       title: string;
-//     };
-//     cinema_room: {
-//       id: number;
-//       name: string;
-//       seat_layout: number[][];
-//     };
-//     date: string;
-//   };
-//   seat_row: number;
-//   seat_column: number;
-// }
 
 interface ReservationsTableProps {
   reservations: Reservation[];
@@ -84,6 +61,8 @@ export default function ReservationsTable({ reservations, loading }: Reservation
     switch (columnKey) {
       case "id":
         return reservation.id;
+      case "customer":
+        return <div><p>{reservation.user.username}</p><p>{reservation.user.email}</p></div>
       case "movie":
         return reservation.showing.movie.title;
       case "date":
@@ -146,10 +125,11 @@ export default function ReservationsTable({ reservations, loading }: Reservation
       >
 <TableHeader>
   <TableColumn key="id">ID</TableColumn>
+  <TableColumn key="customer">Osoba rezerwująca</TableColumn>
   <TableColumn key="movie">Film</TableColumn>
   <TableColumn key="date">Data</TableColumn>
   <TableColumn key="cinema_room">Sala</TableColumn>
-  <TableColumn key="place">Sala</TableColumn>
+  <TableColumn key="place">Miejsce</TableColumn>
   <TableColumn key="seat_layout">Układ sali</TableColumn>
 </TableHeader>
         <TableBody items={paginatedReservations}>

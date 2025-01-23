@@ -47,7 +47,7 @@ export default function ConfirmHallDeleteModal({ isOpen, onClose, onConfirm, hal
   };
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
+    <Modal className="py-1" isOpen={isOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <ModalContent>
         {() => (
           <>
@@ -56,10 +56,10 @@ export default function ConfirmHallDeleteModal({ isOpen, onClose, onConfirm, hal
               <p>Czy na pewno chcesz usunąć salę kinową &quot;{hall.name}&quot;?</p>
             </ModalBody>
             <ModalFooter>
-              <Button color="primary" variant="light" onPress={onClose}>
+              <Button color="primary" variant="ghost" onPress={onClose}>
                 Anuluj
               </Button>
-              <Button color="danger" onPress={() => handleDelete()}>
+              <Button color="danger" variant="ghost" onPress={() => handleDelete()}>
                 Usuń
               </Button>
             </ModalFooter>

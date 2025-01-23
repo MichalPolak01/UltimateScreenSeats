@@ -15,7 +15,7 @@ export const siteConfig = {
       authRequired: false
     },
     {
-      label: "Dashboard",
+      label: "Zarządzanie kinem",
       href: "/dashboard",
       authRequired: true
     }
