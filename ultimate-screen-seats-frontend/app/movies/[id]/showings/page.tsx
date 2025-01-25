@@ -5,10 +5,13 @@ import { Select, SelectItem } from "@nextui-org/select";
 import { Button } from "@nextui-org/button";
 import { Spinner } from "@nextui-org/spinner";
 import { Avatar } from "@nextui-org/avatar";
+import { useRouter } from "next/navigation";
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@heroui/modal";
 
 import MovieLayout from "../layout";
 
 import { showToast } from "@/lib/showToast";
+import { useAuth } from "@/providers/authProvider";
 
 const MOVIES_URL = "/api/movies";
 const SHOWINGS_URL = "/api/showings";
@@ -26,9 +29,20 @@ export default function ShowingPage({ params }: { params: Promise<{ id: string }
   const [summary, setSummary] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  const auth = useAuth();
+  const router = useRouter();
+
   const fetchShowings = async () => {
     try {
       const response = await fetch(`${SHOWINGS_URL}?movieId=${id}`);
+
+      if (response.status === 404) {
+        showToast("Nie znaleziono seansów dla wybranego filmu.", true);
+
+        return;
+      }
 
       if (!response.ok) throw new Error("Failed to fetch showings.");
       const data = await response.json();
@@ -42,6 +56,10 @@ export default function ShowingPage({ params }: { params: Promise<{ id: string }
   const fetchReservations = async () => {
     try {
       const response = await fetch(RESERVATIONS_URL);
+
+      if (response.status === 404) {
+        return;
+      }
 
       if (!response.ok) throw new Error("Failed to fetch reservations.");
       const data = await response.json();
@@ -61,7 +79,13 @@ export default function ShowingPage({ params }: { params: Promise<{ id: string }
       });
 
       if (response.status === 401) {
-        // auth.loginRequired();
+        auth.loginRequired();
+
+        return;
+      }
+
+      if (response.status === 404) {
+        router.push('/not-found');
 
         return;
       }
@@ -110,7 +134,7 @@ export default function ShowingPage({ params }: { params: Promise<{ id: string }
         )
       );
 
-      setSummary((prev) => (prev ? prev - Number(selectedShowing.ticket_price) : 0));
+      setSummary((prev) => (prev ? prev - Number(selectedShowing.ticket_price) : null));
     } else {
       setSelectedSeats((prev) => [
         ...prev,
@@ -129,32 +153,28 @@ export default function ShowingPage({ params }: { params: Promise<{ id: string }
   };
 
   const handleReservation = async () => {
-    if (!selectedShowingId) {
-      showToast("Wybierz seans przed dokonaniem rezerwacji.", true);
+    if (!selectedSeats) {
+      showToast("Wybierz miejsca aby dokonać ich rezerwacji!", true);
 
       return;
     }
 
-    console.log(selectedSeats);
+    try {
+      const response = await fetch(RESERVATIONS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(selectedSeats),
+      });
 
-    // try {
-    //   const response = await fetch(RESERVATIONS_URL, {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({
-    //       // showing_id: selectedShowingId,
-    //       // seats: selectedSeats,
-    //       selectedSeats
-    //     }),
-    //   });
+      if (!response.ok) throw new Error("Nie udało się dokonać rezerwacji.");
 
-    //   if (!response.ok) throw new Error("Nie udało się dokonać rezerwacji.");
-    //   showToast("Rezerwacja zakończona sukcesem!", false);
-    //   setSelectedSeats([]);
-    //   fetchReservations();
-    // } catch {
-    //   showToast("Wystąpił błąd podczas rezerwacji.", true);
-    // }
+      showToast("Rezerwacja zakończona sukcesem!", false);
+      setSelectedSeats([]);
+      fetchReservations();
+      router.push('/reservations')
+    } catch {
+      showToast("Wystąpił błąd podczas rezerwacji.", true);
+    }
   };
 
   const renderSeatLayout = (
@@ -186,10 +206,10 @@ export default function ShowingPage({ params }: { params: Promise<{ id: string }
               <div
                 key={`${rowIndex}-${columnIndex}`}
                 className={`w-8 h-8 flex items-center justify-center rounded cursor-pointer ${isReserved
-                    ? "bg-red-500 text-white"
-                    : isSelected
-                      ? "bg-primary text-white"
-                      : "bg-gray-300"
+                  ? "bg-red-500 text-white"
+                  : isSelected
+                    ? "bg-primary text-white"
+                    : "bg-gray-300"
                   }`}
                 role="button"
                 tabIndex={0}
@@ -215,7 +235,7 @@ export default function ShowingPage({ params }: { params: Promise<{ id: string }
     return (
       <div className="flex flex-row gap-4 h-full justify-center items-center">
         <Spinner />
-        <p className="text-md">Loading movie details...</p>
+        <p className="text-md">Ładowanie detali seansu...</p>
       </div>
     );
   }
@@ -230,8 +250,8 @@ export default function ShowingPage({ params }: { params: Promise<{ id: string }
         <div className="w-full flex gap-8 mb-3">
           <div>
             <Avatar
-              alt="HeroUI Fruit Image with Zoom"
-              className="h-auto min-w-[5rem]"
+              alt="Okładka filmu"
+              className="h-auto min-w-[5rem] border-1 border-default-300"
               radius="sm"
               src={movie?.image}
             />
@@ -312,21 +332,91 @@ export default function ShowingPage({ params }: { params: Promise<{ id: string }
             </div>
           </div>
         )}
-        {summary &&
-          <div className="mb-4">
+        {(summary !== null && summary > 0) && (
+          <div className="mb-2">
             <h3 className="mb-2 border-b-2 border-default-400 text-2xl font-semibold text-success">Łącznie do zapłaty</h3>
             <p className="font-bold text-danger text-lg">{summary.toFixed(2)} zł</p>
           </div>
-        }
+        )}
 
         <Button
+          className="mt-6"
           color="primary"
           isDisabled={!selectedShowingId || selectedSeats.length === 0}
-          onPress={handleReservation}
+          onPress={onOpen}
         >
           Zarezerwuj
         </Button>
       </div>
+
+      <Modal backdrop="blur" isOpen={isOpen} size="lg" onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1 text-2xl text-primary">
+                Czy na pewno chcesz zarezerwować wybrane miejsca?
+              </ModalHeader>
+
+              <ModalBody>
+                {selectedSeats.length > 0 ? (
+                  selectedSeats
+                    .reduce<GroupedSeats[]>((acc, seat) => {
+                      const showing = showings.find((show) => show.id === seat.showing_id);
+
+                      if (!showing) return acc;
+
+                      const existingShowing = acc.find(
+                        (group) => group.showing.id === showing.id
+                      );
+
+                      if (existingShowing) {
+                        existingShowing.seats.push(seat);
+                      } else {
+                        acc.push({
+                          showing,
+                          seats: [seat],
+                        });
+                      }
+
+                      return acc;
+                    }, [])
+                    .map((group, index) => (
+                      <div key={index} className="mb-4">
+                        <h4 className="font-bold text-lg mb-2">
+                          Seans:{" "}
+                          {new Date(group.showing.date).toLocaleString()} -{" "}
+                          {group.showing.cinema_room.name}
+                        </h4>
+
+                        <ul>
+                          {group.seats.map((seat, seatIndex) => (
+                            <li key={seatIndex} className="flex justify-between text-sm mb-2">
+                              <span>
+                                <strong>Rząd:</strong> <span className="text-primary font-semibold">{seat.seat_row + 1}</span>,&nbsp;
+                                <strong>Miejsce:</strong> <span className="text-primary font-semibold">{seat.seat_column + 1}</span>
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))
+                ) : (
+                  <p>Nie wybrano żadnych miejsc.</p>
+                )}
+              </ModalBody>
+
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Anuluj
+                </Button>
+                <Button color="primary" onPress={handleReservation}>
+                  Zarezerwuj
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </MovieLayout>
   );
 }

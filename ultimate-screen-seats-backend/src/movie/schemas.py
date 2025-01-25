@@ -1,7 +1,6 @@
 from datetime import date
 from typing import List, Optional
 from ninja import Schema
-from pydantic import fields
 
 
 class GenreSchema(Schema):
@@ -51,8 +50,6 @@ class MovieUpdateSchema(Schema):
     trailer_url: Optional[str] = None
     cast: Optional[str] = None
     director: Optional[str] = None
-
-
 
 
 class GenreCreateSchema(Schema):

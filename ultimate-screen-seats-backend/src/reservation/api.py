@@ -1,6 +1,7 @@
-from typing import Optional
+from typing import List, Optional
 from ninja_extra import Router
 
+from django.db import transaction
 from core.schemas import MessageSchema
 
 from .schemas import ReservationCreateSchema, ReservationSchema, ReservationUpdateSchema
@@ -12,32 +13,45 @@ import helpers
 router = Router()
 
 
-@router.post('', response={201: ReservationSchema, 400: MessageSchema, 404: MessageSchema}, auth=helpers.auth_required)
-def create_reservation(request, payload: ReservationCreateSchema):
-    """Create a reservation for a specific seat"""
+@router.post('', response={201: list[ReservationSchema], 400: MessageSchema, 404: MessageSchema}, auth=helpers.auth_required)
+def create_reservations(request, payload: list[ReservationCreateSchema]):
+    """Create multiple reservations in one request"""
 
     try:
         user = request.user
 
-        showing = Showing.objects.get(id=payload.showing_id)
-        cinema_room = showing.cinema_room
+        reservations = []
+        with transaction.atomic():
+            for reservation_data in payload:
+                showing_id = reservation_data.showing_id
+                seat_row = reservation_data.seat_row
+                seat_column = reservation_data.seat_column
 
-        if payload.seat_row >= len(cinema_room.seat_layout) or payload.seat_column >= len(cinema_room.seat_layout[0]):
-            return 400, {"message": "Invalid seat coordinates."}
+                try:
+                    showing = Showing.objects.get(id=showing_id)
+                except Showing.DoesNotExist:
+                    return 404, {"message": f"Showing with id {showing_id} doesn't exist."}
 
-        if Reservation.objects.filter(showing=showing, seat_row=payload.seat_row, seat_column=payload.seat_column).exists():
-            return 400, {"message": "Seat is already reserved."}
+                cinema_room = showing.cinema_room
+                if (
+                    seat_row >= len(cinema_room.seat_layout) or 
+                    seat_column >= len(cinema_room.seat_layout[0])
+                ):
+                    return 400, {"message": f"Invalid seat coordinates for Showing ID {showing_id}."}
 
-        reservation = Reservation.objects.create(
-            showing=showing,
-            user=user,
-            seat_row=payload.seat_row,
-            seat_column=payload.seat_column
-        )
+                if Reservation.objects.filter(showing=showing, seat_row=seat_row, seat_column=seat_column).exists():
+                    return 400, {"message": f"Seat ({seat_row + 1}, {seat_column + 1}) for Showing ID {showing_id} is already reserved."}
 
-        return 201, reservation
-    except Showing.DoesNotExist:
-        return 404, {"message": f"Showing with id {payload.showing_id} doesn't exist."}
+                reservation = Reservation.objects.create(
+                    showing=showing,
+                    user=user,
+                    seat_row=seat_row,
+                    seat_column=seat_column
+                )
+                reservations.append(reservation)
+
+        return 201, reservations
+
     except Exception as e:
         return 400, {"message": f"An unexpected error occurred: {e}"}
     

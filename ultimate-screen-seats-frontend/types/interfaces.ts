@@ -73,3 +73,9 @@ interface ReservationSeat {
     seat_row: number
     seat_column: number
 }
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface GroupedSeats {
+    showing: Showing
+    seats: ReservationSeat[]
+}
