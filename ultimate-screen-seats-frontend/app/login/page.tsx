@@ -103,6 +103,11 @@ export default function Page() {
             ...formData,
             [event.target.name]: event.target.value
         });
+
+        if (loginError) {
+            setLoginError(false);
+            setLoginMessage("Wprowadź poprawny adres email oraz hasło, aby uzyskać dostęp do swojego konta.");
+        }
     }
     
   return (

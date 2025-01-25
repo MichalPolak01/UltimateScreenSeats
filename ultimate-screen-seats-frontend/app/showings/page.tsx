@@ -79,7 +79,8 @@ export default function Showings() {
                     priority
                     alt="Slider image"
                     className="absolute inset-0 object-cover w-full h-full"
-                    src="/images/movie_database.jpg"
+                    src="/images/person_in_cinema.jpg"
+                    style={{ objectPosition: 'center 60%' }}
                 />
                 <div className="absolute inset-0 bg-black opacity-70 flex flex-col" />
                 <div className="flex flex-col gap-2">
