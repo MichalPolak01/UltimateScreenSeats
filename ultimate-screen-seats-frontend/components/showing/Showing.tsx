@@ -1,15 +1,16 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Card, CardBody, CardHeader } from "@nextui-org/card"
+import { Card, CardBody, CardFooter, CardHeader } from "@nextui-org/card"
 import { Button } from "@nextui-org/button"
+
 import ApiProxy from "@/app/api/proxy";
 import './Showing.tsx.css';
 
 const SHOWING_URL = "/api/showing";
 const RESERVATIONS_URL = "/api/reservation";
 
-type SeatLayout = number[][]
+type SeatLayout = number[][];
 
 export default function Showing({ id }: { id: number }) {
   const [seatLayout, setSeatLayout] = useState<SeatLayout | null>(null)
@@ -23,6 +24,7 @@ export default function Showing({ id }: { id: number }) {
 
       if (res.ok) {
         const reservation = data;
+
         if (reservation?.cinema_room?.seat_layout) {
           setSeatLayout(reservation.cinema_room.seat_layout);
         } else {
@@ -31,8 +33,7 @@ export default function Showing({ id }: { id: number }) {
       } else {
         setError(data?.message || "Błąd podczas pobierania dostępnych miejsc.");
       }
-    } catch (err) {
-      console.error("Błąd podczas pobierania dostępnych miejsc:", err);
+    } catch {
       setError("Wystąpił błąd podczas pobierania danych.");
     }
   };
@@ -41,6 +42,7 @@ export default function Showing({ id }: { id: number }) {
     const seatIndex = selectedSeats.findIndex(
       (seat) => seat.row === row && seat.column === column
     );
+
     if (seatIndex >= 0) {
       setSelectedSeats((prev) => prev.filter((_, index) => index !== seatIndex));
     } else {
@@ -51,6 +53,7 @@ export default function Showing({ id }: { id: number }) {
   const reserveSeats = async () => {
     if (selectedSeats.length === 0) {
       setError("Nie wybrano żadnych miejsc.");
+
       return;
     }
 
@@ -64,14 +67,14 @@ export default function Showing({ id }: { id: number }) {
 
         if (status !== 201) {
           setError(error?.message || "Błąd przy rezerwowaniu miejsca.");
+
           return;
         }
       }
 
       setSelectedSeats([]);
       setError(null);
-    } catch (err) {
-      console.error("Błąd podczas rezerwacji:", err);
+    } catch {
       setError("Wystąpił błąd podczas rezerwacji.");
     }
   };
@@ -90,9 +93,9 @@ export default function Showing({ id }: { id: number }) {
           <CardBody>
             <p className="text-lg mb-4">{error}</p>
             <Button
+              className="w-full mt-4"
               color="default"
               onClick={() => window.location.reload()}
-              className="w-full mt-4"
             >
               Odśwież stronę
             </Button>
@@ -112,8 +115,7 @@ export default function Showing({ id }: { id: number }) {
         <CardBody className="overflow-hidden flex flex-col">
           {seatLayout ? (
             <div className="flex flex-col items-center">
-              <div className="w-full h-3 bg-black mb-8 flex justify-center items-center text-white font-bold text-lg rounded-lg">
-              </div>
+              <div className="w-full h-3 bg-black mb-8 flex justify-center items-center text-white font-bold text-lg rounded-lg" />
               <div className="grid gap-8">
                 {seatLayout.map((row, rowIndex) => (
                   <div key={rowIndex} className="flex justify-center space-x-8">
@@ -121,11 +123,11 @@ export default function Showing({ id }: { id: number }) {
                       if (seat === -1) {
                         return (
                           <div
-                            key={columnIndex}
+                            key={`${rowIndex}-${columnIndex}`}
                             className="w-16 h-16 bg-transparent"
                             style={{ visibility: "hidden" }}
-                          ></div>
-                        )
+                           />
+                        );
                       }
 
                       const isSelected = selectedSeats.some(
@@ -137,6 +139,7 @@ export default function Showing({ id }: { id: number }) {
                       const isFree = seat === 0
 
                       let seatClass = "cursor-pointer w-16 h-16"
+
                       if (isOccupied) {
                         seatClass = "bg-gray-500 cursor-not-allowed shadow-xl"
                       } else if (isSelected) {
@@ -146,17 +149,16 @@ export default function Showing({ id }: { id: number }) {
                       }
 
                       return (
-                        <div className="flex items-center justify-center">
+                        <div key={`${rowIndex}-${columnIndex}`} className="flex items-center justify-center">
                           <input
-                            type="checkbox"
-                            key={columnIndex}
-                            disabled={isOccupied || seat === -1}
                             checked={isSelected}
-                            onChange={() => toggleSeatSelection(rowIndex, columnIndex)}
                             className={`checkbox w-10 h-10 cursor-pointer appearance-none border-2 border-gray-500 rounded-lg ${seatClass}`}
+                            disabled={isOccupied || seat === -1}
+                            type="checkbox"
+                            onChange={() => toggleSeatSelection(rowIndex, columnIndex)}
                           />
                         </div>
-                      )
+                      );
                     })}
                   </div>
                 ))}
@@ -166,10 +168,12 @@ export default function Showing({ id }: { id: number }) {
             <p className="text-center text-gray-400">Ładowanie układu sali...</p>
           )}
         </CardBody>
+        <CardFooter className="flex justify-center mt-2">
+          <Button className="mt-6 w-full max-w-lg" onClick={reserveSeats}>
+            Zarezerwuj wybrane miejsca
+          </Button>
+        </CardFooter>
       </Card>
-      <Button onClick={reserveSeats} className="mt-6 w-full max-w-lg">
-        Zarezerwuj wybrane miejsca
-      </Button>
     </div>
   )
 }

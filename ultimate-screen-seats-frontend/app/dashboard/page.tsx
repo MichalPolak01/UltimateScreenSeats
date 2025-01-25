@@ -20,12 +20,12 @@ import { useAuth } from "@/providers/authProvider";
 import AddShowingModal from "@/components/dashboard/showings/showingAdd";
 import ConfirmDeleteShowingModal from "@/components/dashboard/showings/showingsDelete";
 
-
 const MOVIES_URL = "api/movies";
 const HALLS_URL = "api/halls";
 const SHOWINGS_URL = "api/showings";
 const RESERVATIONS_URL = "api/reservations";
 const GENRES_URL = 'api/movies/genres'
+
 
 export default function App() {
   const [movies, setMovies] = useState<Movie[]>([]);

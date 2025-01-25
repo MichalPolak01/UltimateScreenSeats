@@ -1,13 +1,15 @@
 "use client";
 
-import { useAuth } from "@/providers/authProvider";
 import { useEffect, useState } from "react";
-import { Reservation } from "@/app/interfaces/reservation";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { Button } from "@nextui-org/button";
+
+import { Reservation } from "@/app/interfaces/reservation";
+import { useAuth } from "@/providers/authProvider";
 import ApiProxy from "@/app/api/proxy";
 
 const RESERVATIONS_URL = "/api/reservation";
+
 
 export default function Reservations() {
     const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -17,6 +19,7 @@ export default function Reservations() {
     const fetchReservations = async () => {
         if (!authToken || !userId) {
             setError("Nieprawidłowy token lub brak userId.");
+
             return;
         }
         const url = `${RESERVATIONS_URL}?user_id=${userId}`;
@@ -28,9 +31,8 @@ export default function Reservations() {
                 setReservations(Array.isArray(data) ? data : []);
             } else {
                 setError(error?.message || "Wystąpił błąd przy pobieraniu rezerwacji.");
-            } 
-        } catch (err) {
-            console.error("Błąd podczas pobierania rezerwacji:", err);
+            }
+        } catch {
             setError("Wystąpił błąd podczas pobierania danych.");
         }
     };
@@ -41,10 +43,10 @@ export default function Reservations() {
 
     const handleDelete = async (reservationId: number) => {
         const url = `${RESERVATIONS_URL}/${reservationId}`;
-        
+
         try {
             const { status, error } = await ApiProxy.delete(url, true);
-    
+
             if (status === 200) {
                 setReservations((prevReservations) =>
                     prevReservations.filter((reservation) => reservation.id !== reservationId)
@@ -52,12 +54,11 @@ export default function Reservations() {
             } else {
                 setError(error?.message || "Nie udało się usunąć rezerwacji. Spróbuj ponownie.");
             }
-        } catch (err) {
-            console.error("Błąd podczas usuwania rezerwacji:", err);
+        } catch {
             setError("Błąd podczas usuwania rezerwacji.");
         }
     };
-    
+
     if (error) {
         return (
             <div className="flex justify-center items-center h-screen max-w-7xl mx-auto">
@@ -68,9 +69,9 @@ export default function Reservations() {
                     <CardBody>
                         <p className="text-lg mb-4">{error}</p>
                         <Button
+                            className="w-full mt-4"
                             color="default"
                             onClick={() => window.location.reload()}
-                            className="w-full mt-4"
                         >
                             Odśwież stronę
                         </Button>
@@ -81,13 +82,13 @@ export default function Reservations() {
     }
 
     return (
-        <div className="flex flex-col justify-center mt-10 max-w-7xl mx-auto">
+        <div className="flex flex-col justify-center mt-10 max-w-7xl mx-auto sm:px-8 px-4">
             <Card className="w-full p-8">
-                <CardHeader className="p-2 flex-col items-start border-b-2 border-default-200 mb-4">
+                <CardHeader className="p-2 flex-col items-start border-b-2 border-default-200 mb-6">
                     <h1 className="text-primary text-4xl font-semibold mb-2">Moje Rezerwacje</h1>
                     <h2 className="text-default-500 text-lg">Wszystkie twoje rezerwacje w jednym miejscu.</h2>
                 </CardHeader>
-                <CardBody className="overflow-hidden flex flex-col">
+                <CardBody className="overflow-hidden flex flex-col p-0">
                     {reservations.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                             {reservations.map((reservation) => (

@@ -44,13 +44,17 @@ def create_showing(request, payload: ShowingCreateSchema):
     
 
 @router.get('', response={200: list[ShowingSchema], 404: MessageSchema, 500: MessageSchema})
-def get_showings(request,  limit: Optional[int] = None):
+def get_showings(request,  limit: Optional[int] = None, movieId: Optional[int] = None):
     """Fetch list of schowings"""
 
     try:
         now = make_aware(datetime.now())
 
         showings = Showing.objects.filter(date__gt=now).order_by('date')
+
+
+        if movieId is not None:
+            showings = showings.filter(movie_id=movieId)
 
         if limit is not None:
             showings = showings[:limit]

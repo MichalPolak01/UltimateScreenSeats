@@ -27,6 +27,7 @@ import { useAuth } from "@/providers/authProvider";
 export const Navbar = () => {
   const auth = useAuth();
   const pathname = usePathname();
+  const navItems = auth.role === "ADMIN" ? siteConfig.navAdminItems : siteConfig.navItems;
 
   return (
     <NextUINavbar maxWidth="xl" position="sticky">
@@ -39,7 +40,7 @@ export const Navbar = () => {
         </NavbarBrand>
         
         <ul className="hidden sm:flex gap-4 justify-start ml-2">
-          {siteConfig.navItems.map((item) => (
+          {navItems.map((item) => (
             (!item.authRequired || auth.isAuthenticated) && (
               <NavbarItem key={item.href}>
                 <NextLink

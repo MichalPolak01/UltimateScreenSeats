@@ -10,6 +10,7 @@
 	},
 	"dependencies": {
 		"@heroui/chip": "^2.2.6",
+		"@heroui/image": "^2.2.6",
 		"@heroui/input": "^2.4.9",
 		"@heroui/modal": "^2.2.7",
 		"@heroui/pagination": "^2.2.8",

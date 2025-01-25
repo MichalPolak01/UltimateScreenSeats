@@ -11,10 +11,12 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
 
     const limit = searchParams.get("limit");
+    const movieId = searchParams.get("movieId");
 
     const url = new URL(DJANGO_API_SHOWINGS_URL);
 
     if (limit) url.searchParams.append("limit", limit);
+    if (movieId) url.searchParams.append("movieId", movieId);
 
     const { data, status } = await ApiProxy.get(url.toString(), false);
 

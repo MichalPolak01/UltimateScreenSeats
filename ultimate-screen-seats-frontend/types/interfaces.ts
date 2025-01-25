@@ -66,3 +66,10 @@ interface User {
     email: string
     role: string
 }
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface ReservationSeat {
+    showing_id: number
+    seat_row: number
+    seat_column: number
+}

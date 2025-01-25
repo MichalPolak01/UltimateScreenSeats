@@ -69,7 +69,7 @@ export default function MoviePage({ params }: { params: Promise<{ id: string }> 
 
     return (
         <MovieLayout backgroundImage={movie.background_image}>
-            <div className="max-w-7xl mx-auto mt-[5svh] p-8 lg:h-[85svh] flex lg:flex-row flex-col items-end lg:gap-10 gap-4">
+            <div className="max-w-7xl mx-auto p-8 lg:h-[85svh] flex lg:flex-row flex-col items-end lg:gap-10 gap-4">
                 <div className="lg:w-2/5 w-full relative lg:h-full sm:h-[36svh] h-[20svh]">
                     <Image
                         fill

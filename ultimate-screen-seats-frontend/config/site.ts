@@ -13,6 +13,18 @@ export const siteConfig = {
       label: "Filmy",
       href: "/movies",
       authRequired: false
+    }
+  ],
+  navAdminItems: [
+    {
+      label: "Seanse",
+      href: "/showings",
+      authRequired: false
+    },
+    {
+      label: "Filmy",
+      href: "/movies",
+      authRequired: false
     },
     {
       label: "Zarządzanie kinem",
