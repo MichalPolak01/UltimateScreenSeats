@@ -85,28 +85,41 @@ export default function ShowingsTable({
     layout: number[][],
     reservationsForShowing: { seat_row: number; seat_column: number }[]
   ) => (
-    <div className="inline-grid gap-1" style={{ gridTemplateColumns: `repeat(${layout[0].length}, 1fr)` }}>
+    <div
+      className="inline-grid gap-1"
+      style={{ gridTemplateColumns: `repeat(${layout[0].length}, 1fr)` }}
+    >
       {layout.flatMap((row, rowIndex) =>
         row.map((seat, colIndex) => {
+          if (seat === -1) {
+            return (
+              <div
+                key={`${rowIndex}-${colIndex}`}
+                className="w-6 h-6 bg-transparent"
+                style={{ visibility: "hidden" }}
+              />
+            );
+          }
+  
           const isReserved = reservationsForShowing.some(
             (res) => res.seat_row === rowIndex && res.seat_column === colIndex
           );
-
+  
           return (
             <div
-            key={`${rowIndex}-${colIndex}`}
-            className={`w-6 h-6 flex items-center justify-center rounded text-xs ${
-              isReserved ? "bg-red-500 text-white" : "bg-primary-400"
-            }`}
-          >
-            {isReserved ? "X" : ""}
-          </div>
+              key={`${rowIndex}-${colIndex}`}
+              className={`w-6 h-6 flex items-center justify-center rounded text-xs ${
+                isReserved ? "bg-red-500 text-white" : "bg-primary-400"
+              }`}
+            >
+              {isReserved ? "X" : ""}
+            </div>
           );
         })
       )}
     </div>
   );
-
+  
   const renderCell = (showing: Showing, columnKey: keyof Showing | "actions" | "seat_layout") => {
     switch (columnKey) {
       case "id":

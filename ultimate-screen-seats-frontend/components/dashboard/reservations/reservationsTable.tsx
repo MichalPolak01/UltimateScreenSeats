@@ -7,7 +7,6 @@ import { Pagination } from "@heroui/pagination";
 import { Tooltip } from "@nextui-org/tooltip";
 import { Spinner } from "@nextui-org/spinner";
 
-
 interface ReservationsTableProps {
   reservations: Reservation[];
   loading: boolean;
@@ -36,24 +35,36 @@ export default function ReservationsTable({ reservations, loading }: Reservation
   const totalPages = Math.ceil(filteredReservations.length / rowsPerPage);
 
   const renderSeatLayout = (layout: number[][], seatRow: number, seatCol: number) => (
-    <div className="inline-grid gap-1 p-2" style={{ gridTemplateColumns: `repeat(${layout[0].length}, 1fr)` }}>
-      {layout.flat().map((seat, index) => {
-        const rowIndex = Math.floor(index / layout[0].length);
-        const colIndex = index % layout[0].length;
+    <div
+      className="inline-grid gap-1 p-2"
+      style={{ gridTemplateColumns: `repeat(${layout[0].length}, 1fr)` }}
+    >
+      {layout.flatMap((row, rowIndex) =>
+        row.map((seat, colIndex) => {
+          if (seat === -1) {
+            return (
+              <div
+                key={`${rowIndex}-${colIndex}`}
+                className="w-6 h-6 bg-transparent"
+                style={{ visibility: "hidden" }}
+              />
+            );
+          }
 
-        const isReserved = rowIndex === seatRow && colIndex === seatCol;
+          const isReserved = rowIndex === seatRow && colIndex === seatCol;
 
-        return (
-          <div
-            key={`${rowIndex}-${colIndex}`}
-            className={`w-6 h-6 flex items-center justify-center rounded text-xs ${
-              isReserved ? "bg-red-500 text-white" : "bg-primary-400"
-            }`}
-          >
-            {isReserved ? "X" : ""}
-          </div>
-        );
-      })}
+          return (
+            <div
+              key={`${rowIndex}-${colIndex}`}
+              className={`w-6 h-6 flex items-center justify-center rounded text-xs ${
+                isReserved ? "bg-red-500 text-white" : "bg-primary-400"
+              }`}
+            >
+              {isReserved ? "X" : ""}
+            </div>
+          );
+        })
+      )}
     </div>
   );
 
@@ -62,15 +73,20 @@ export default function ReservationsTable({ reservations, loading }: Reservation
       case "id":
         return reservation.id;
       case "customer":
-        return <div><p>{reservation.user.username}</p><p>{reservation.user.email}</p></div>
+        return (
+          <div>
+            <p>{reservation.user.username}</p>
+            <p>{reservation.user.email}</p>
+          </div>
+        );
       case "movie":
         return reservation.showing.movie.title;
       case "date":
         return new Date(reservation.showing.date).toLocaleString();
-    case "cinema_room":
+      case "cinema_room":
         return reservation.showing.cinema_room.name;
-    case "place":
-        return "Rząd "+reservation.seat_row +" miejsce "+ reservation.seat_column
+      case "place":
+        return `Rząd ${reservation.seat_row + 1}, Miejsce ${reservation.seat_column + 1}`;
       case "seat_layout":
         return (
           <Tooltip content="Układ sali kinowej">
@@ -123,20 +139,22 @@ export default function ReservationsTable({ reservations, loading }: Reservation
         }
         color="primary"
       >
-<TableHeader>
-  <TableColumn key="id">ID</TableColumn>
-  <TableColumn key="customer">Osoba rezerwująca</TableColumn>
-  <TableColumn key="movie">Film</TableColumn>
-  <TableColumn key="date">Data</TableColumn>
-  <TableColumn key="cinema_room">Sala</TableColumn>
-  <TableColumn key="place">Miejsce</TableColumn>
-  <TableColumn key="seat_layout">Układ sali</TableColumn>
-</TableHeader>
+        <TableHeader>
+          <TableColumn key="id">ID</TableColumn>
+          <TableColumn key="customer">Osoba rezerwująca</TableColumn>
+          <TableColumn key="movie">Film</TableColumn>
+          <TableColumn key="date">Data</TableColumn>
+          <TableColumn key="cinema_room">Sala</TableColumn>
+          <TableColumn key="place">Miejsce</TableColumn>
+          <TableColumn key="seat_layout">Układ sali</TableColumn>
+        </TableHeader>
         <TableBody items={paginatedReservations}>
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
-                <TableCell>{renderCell(item, columnKey as keyof Reservation | "actions")}</TableCell>
+                <TableCell>
+                  {renderCell(item, columnKey as keyof Reservation | "actions")}
+                </TableCell>
               )}
             </TableRow>
           )}
