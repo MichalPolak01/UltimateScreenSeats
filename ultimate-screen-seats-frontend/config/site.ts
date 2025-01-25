@@ -49,33 +49,30 @@ export const siteConfig = {
       authRequired: false
     },
     {
+      label: "Rezerwacje",
+      href: "/reservations",
+      authRequired: true
+    },
+    {
       label: "Ustwaienia profilowe",
       href: "/profile",
       authRequired: true
     },
+  ],
+  navMenuAdmin: [
     {
-      label: "Logowanie",
-      href: "/login",
-      authRequired: false
-    },
-    {
-      label: "Rejestracja",
-      href: "/register",
-      authRequired: false
-    },
-    {
-      label: "Logout",
-      href: "/logout",
+      label: "Zarządzanie kinem",
+      href: "/dashboard",
       authRequired: true
     }
   ],
   navMenuAuth: [
     {
-      label: "Login",
+      label: "Logowanie",
       href: "/login"
     },
     {
-      label: "Register",
+      label: "Rejestracja",
       href: "/register"
     }
   ],

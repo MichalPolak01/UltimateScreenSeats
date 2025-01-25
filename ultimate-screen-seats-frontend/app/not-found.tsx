@@ -29,10 +29,10 @@ export default function NotFoundPage() {
             <div className="relative w-full h-full" onMouseMove={handleMouseMove}>
                 <div className="absolute inset-0 w-full h-full z-0">
                     <Image
+                        fill
                         priority
                         alt="Tło strony not found"
                         className="object-cover w-full h-full"
-                        layout="fill"
                         src="/images/question-mark.jpg"
                     />
                     <div className="absolute inset-0 bg-black bg-opacity-40 z-5" />

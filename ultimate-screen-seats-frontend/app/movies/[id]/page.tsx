@@ -11,6 +11,7 @@ import MovieLayout from "./layout";
 
 import { showToast } from "@/lib/showToast";
 import { useAuth } from "@/providers/authProvider";
+import { useRouter } from "next/navigation";
 
 
 const MOVIES_URL = "/api/movies";
@@ -21,6 +22,7 @@ export default function MoviePage({ params }: { params: Promise<{ id: string }> 
     const [loading, setLoading] = useState(true);
 
     const auth = useAuth();
+    const router = useRouter();
 
     useEffect(() => {
         const fetchMovieDetails = async () => {
@@ -33,6 +35,12 @@ export default function MoviePage({ params }: { params: Promise<{ id: string }> 
 
                 if (response.status === 401) {
                     auth.loginRequired();
+
+                    return;
+                }
+
+                if (response.status === 404) {
+                    router.push('/not-found');
 
                     return;
                 }

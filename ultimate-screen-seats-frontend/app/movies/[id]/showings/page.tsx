@@ -3,20 +3,20 @@
 import React, { useState, useEffect, use } from "react";
 import { Select, SelectItem } from "@nextui-org/select";
 import { Button } from "@nextui-org/button";
-import { showToast } from "@/lib/showToast";
-import MovieLayout from "../layout";
 import { Spinner } from "@nextui-org/spinner";
-import { Image } from "@heroui/image";
 import { Avatar } from "@nextui-org/avatar";
+
+import MovieLayout from "../layout";
+
+import { showToast } from "@/lib/showToast";
 
 const MOVIES_URL = "/api/movies";
 const SHOWINGS_URL = "/api/showings";
 const RESERVATIONS_URL = "/api/reservations";
 
 
-
 export default function ShowingPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = React.use(params);
+  const { id } = use(params);
 
   const [movie, setMovie] = useState<Movie>();
   const [showings, setShowings] = useState<Showing[]>([]);

@@ -38,7 +38,7 @@ export const Navbar = () => {
             <p className="font-bold text-inherit text-primary-500">UltimateScreenSeats</p>
           </NextLink>
         </NavbarBrand>
-        
+
         <ul className="hidden sm:flex gap-4 justify-start ml-2">
           {navItems.map((item) => (
             (!item.authRequired || auth.isAuthenticated) && (
@@ -59,26 +59,12 @@ export const Navbar = () => {
             )
           ))}
         </ul>
-       
+
       </NavbarContent>
-
-    {/* <NavbarItem>
-      <NextLink
-        className={clsx(
-          linkStyles({ color: "foreground" }),
-          "data-[active=true]:text-primary data-[active=true]:font-medium",
-        )}
-        color="foreground"
-        href="/showing/1" 
-      >
-        Przejdź do Seansu
-      </NextLink>
-    </NavbarItem> */}
-
 
       <NavbarContent className="hidden sm:flex basis-1/5 sm:basis-full" justify="end">
         <ThemeSwitch />
-        {auth.isAuthenticated?
+        {auth.isAuthenticated ?
           <NavbarAccount />
           :
           siteConfig.navMenuAuth.map((item) => (
@@ -96,7 +82,7 @@ export const Navbar = () => {
             </NavbarItem>
           ))
         }
-        
+
       </NavbarContent>
 
       <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
@@ -107,23 +93,75 @@ export const Navbar = () => {
       <NavbarMenu>
         <div className="mx-4 mt-2 flex flex-col gap-2">
           {siteConfig.navMenuItems.map((item, index) => (
-            (item.authRequired && auth.isAuthenticated) && (
-            <NavbarMenuItem key={`${item}-${index}`}>
+            (item.authRequired && auth.isAuthenticated || !item.authRequired) && (
+              <NavbarMenuItem key={`${item}-${index}`}>
+                <NextLink
+                  className={clsx(
+                    linkStyles({ color: "foreground" }),
+                    {
+                      "text-primary font-medium": pathname === item.href || (item.href === '/' && pathname === '/'),
+                      "text-default-500": !(pathname === item.href || (item.href === '/' && pathname === '/')),
+                    }
+                  )}
+                  href={item.href}
+                >
+                  {item.label}
+                </NextLink>
+
+              </NavbarMenuItem>
+            )))}
+
+          {auth.role === "ADMIN" &&
+            siteConfig.navMenuAdmin.map((item) => (
+              <NavbarItem key={item.href}>
+                <NextLink
+                  className={clsx(
+                    linkStyles({ color: "foreground" }),
+                    {
+                      "text-primary font-medium": pathname.startsWith(item.href),
+                      "text-default-500": !pathname.startsWith(item.href),
+                    }
+                  )}
+                  color="foreground"
+                  href={item.href}
+                >
+                  {item.label}
+                </NextLink>
+              </NavbarItem>
+            ))
+          }
+
+          {auth.isAuthenticated &&
+            <NavbarMenuItem >
               <Link
-                color={
-                  index === 2
-                    ? "primary"
-                    : index === siteConfig.navMenuItems.length - 1
-                      ? "danger"
-                      : "foreground"
-                }
-                href={item.href}
-                size="lg"
-              >
-                {item.label}
+                className="cursor-pointer"
+                color="danger"
+                size="md"
+                onClick={() => auth.logout()}>
+                Wyloguj się
               </Link>
             </NavbarMenuItem>
-          )))}
+          }
+
+          {!auth.isAuthenticated &&
+            siteConfig.navMenuAuth.map((item) => (
+              <NavbarItem key={item.href}>
+                <NextLink
+                  className={clsx(
+                    linkStyles({ color: "foreground" }),
+                    {
+                      "text-primary font-medium": pathname.startsWith(item.href),
+                      "text-default-500": !pathname.startsWith(item.href),
+                    }
+                  )}
+                  color="foreground"
+                  href={item.href}
+                >
+                  {item.label}
+                </NextLink>
+              </NavbarItem>
+            ))
+          }
         </div>
       </NavbarMenu>
     </NextUINavbar>
