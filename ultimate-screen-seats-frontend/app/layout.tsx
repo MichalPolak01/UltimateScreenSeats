@@ -50,7 +50,6 @@ export default function RootLayout({
               {children}
             </main>
             <footer className="z-10 container mx-auto flex flex-wrap gap-4 items-center sm:justify-between justify-center p-5 border-t-2 border-default-300 mt-10">
-            {/* <footer className="relative z-10"> */}
                 <span className="text-default-600">Copyright &copy; 2025</span>
                 <Link
                   isExternal
